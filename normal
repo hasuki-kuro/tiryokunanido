@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>☆12 ノーマル難易度表</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#08080e;
+  --s1:#0d0d18;
+  --s2:#111120;
+  --bdr:#1c1c34;
+  --txt:#bbbbd4;
+  --dim:#55557a;
+  --hh:50px;
+  --mw:264px;
+  --mono:'Courier New',Consolas,monospace;
+}
+
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',system-ui,sans-serif;
+  font-size:13px;
+  line-height:1.4;
+  min-height:100vh;
+}
+
+/* ── HEADER ── */
+#hd{
+  position:fixed;top:0;left:0;right:0;
+  height:var(--hh);
+  background:#0a0a16;
+  border-bottom:1px solid #222242;
+  display:flex;align-items:center;
+  padding:0 14px;
+  z-index:200;
+}
+#hd h1{
+  flex:1;
+  font-size:15px;font-weight:700;
+  color:#7aaaff;
+  letter-spacing:.06em;
+}
+#hd h1 .star{color:#ffd700;margin-right:2px}
+
+/* ── HAMBURGER ── */
+#hbg{
+  width:36px;height:36px;
+  background:none;
+  border:1px solid #282850;
+  border-radius:3px;
+  cursor:pointer;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  gap:5px;padding:7px;
+  flex-shrink:0;
+  transition:border-color .2s;
+}
+#hbg:hover{border-color:#4040a0}
+#hbg span{
+  display:block;width:18px;height:2px;
+  background:#7aaaff;border-radius:1px;
+  transition:transform .22s,opacity .22s;
+}
+#hbg.is-open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+#hbg.is-open span:nth-child(2){opacity:0}
+#hbg.is-open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* ── OVERLAY ── */
+#ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);z-index:300;
+}
+#ov.on{display:block}
+
+/* ── SIDE MENU ── */
+#mn{
+  position:fixed;top:0;right:calc(-1 * var(--mw));
+  width:var(--mw);height:100vh;
+  background:#0c0c1c;
+  border-left:1px solid #222242;
+  z-index:400;
+  transition:right .26s ease;
+  display:flex;flex-direction:column;
+}
+#mn.open{right:0}
+
+#mn-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;
+  border-bottom:1px solid #1a1a32;
+  flex-shrink:0;
+}
+#mn-top span{
+  font-size:11px;color:var(--dim);
+  letter-spacing:.08em;
+}
+#mc{
+  background:none;border:none;
+  color:#7aaaff;font-size:18px;
+  cursor:pointer;line-height:1;
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+}
+#mn-list{overflow-y:auto;flex:1;padding-bottom:24px}
+
+.mn-a{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 16px;
+  color:var(--dim);
+  text-decoration:none;
+  border-bottom:1px solid #14142a;
+  font-size:12px;
+  transition:background .14s,color .14s;
+}
+.mn-a:hover{background:#141430;color:var(--txt)}
+.mn-grade{font-weight:700;min-width:68px}
+.mn-n{font-size:11px;color:var(--dim)}
+
+/* ── MAIN ── */
+#main{padding-top:calc(var(--hh) + 10px);padding-bottom:60px}
+
+/* ── TIER SECTION ── */
+.ts{margin-bottom:24px}
+
+.th{
+  position:sticky;top:var(--hh);
+  background:#0d0d1c;
+  border-left:4px solid var(--tc,#666);
+  padding:6px 14px;
+  display:flex;align-items:center;gap:10px;
+  z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,.5);
+}
+.th h2{
+  font-size:13px;font-weight:700;
+  color:var(--tc,#888);
+  letter-spacing:.04em;
+}
+.th-n{font-size:11px;color:var(--dim)}
+
+/* ── TABLE ── */
+.tbl{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.tbl colgroup .cv{width:34px}
+.tbl colgroup .cn{width:auto}
+.tbl colgroup .cb{width:118px}
+.tbl colgroup .co{width:52px}
+.tbl colgroup .ca{width:200px}
+.tbl colgroup .ct{width:78px}
+
+.tbl thead th{
+  background:var(--s1);
+  color:var(--dim);
+  font-weight:400;
+  font-size:11px;
+  padding:5px 6px;
+  border-bottom:1px solid var(--bdr);
+  white-space:nowrap;
+  overflow:hidden;
+}
+.tbl thead th.cv{text-align:center}
+.tbl thead th.co{text-align:right}
+.tbl thead th.cb,.tbl thead th.ca,.tbl thead th.ct{text-align:left}
+
+.tbl tbody tr{border-bottom:1px solid #101020}
+.tbl tbody tr:nth-child(even){background:rgba(255,255,255,.012)}
+.tbl tbody tr:hover{background:#141432}
+.tbl td{
+  padding:5px 6px;
+  vertical-align:middle;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* column styles */
+td.cv{
+  text-align:center;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--dim);
+}
+td.cn{
+  font-size:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+td.cb{
+  font-family:var(--mono);
+  font-size:12px;
+  color:#8ab0d0;
+  white-space:nowrap;
+}
+td.co{
+  font-family:var(--mono);
+  font-size:12px;
+  color:#8ab0d0;
+  text-align:right;
+}
+td.ca{
+  font-size:11px;
+  color:var(--dim);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+td.ct{white-space:nowrap}
+
+/* type badges */
+.bdg{
+  display:inline-block;
+  padding:1px 5px;
+  border-radius:2px;
+  font-size:10px;font-weight:700;
+  white-space:nowrap;
+  border:1px solid transparent;
+  letter-spacing:.02em;
+}
+
+/* mobile */
+@media(max-width:580px){
+  .ca{display:none}
+  .tbl colgroup .cb{width:90px}
+  .tbl colgroup .co{width:44px}
+  #hd h1{font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<div id="hd">
+  <h1><span class="star">☆12</span> ノーマル難易度表</h1>
+  <button id="hbg" aria-label="メニューを開く">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<div id="ov"></div>
+
+<nav id="mn" aria-label="ティアナビゲーション">
+  <div id="mn-top">
+    <span>TIER LIST</span>
+    <button id="mc" aria-label="メニューを閉じる">✕</button>
+  </div>
+  <div id="mn-list"></div>
+</nav>
+
+<main id="main"></main>
+
+<script>
+/* ── badge colors ── */
+const BC = {
+  'PEAK':    ['#3a2800','#ffaa00','#5a4200'],
+  'CHARGE':  ['#003a28','#00ffaa','#005a3a'],
+  'NOTES':   ['#002a44','#00aaff','#003a64'],
+  'SOF-LAN': ['#28003a','#cc88ff','#3a0050'],
+  'CHORD':   ['#380038','#ff88ff','#500050'],
+  'SCRATCH': ['#380000','#ff8888','#500000'],
+};
+function badge(t){
+  const [bg,fg,bd]=BC[t]||['#222','#aaa','#333'];
+  return `<span class="bdg" style="background:${bg};color:${fg};border-color:${bd}">${t}</span>`;
+}
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── all tier data ── */
+/* format: [ver, name, bpm_str, notes, attr, type] */
+const TIERS = [
+  {id:'js', name:'地力S',    color:'#ffd700', songs:[
+    [29,'Binary Black Hole','190',2000,'CN','PEAK'],
+    [26,'Carmina','195',2000,'階段、縦連打、CN、発狂、ラス殺し','CHARGE'],
+    [22,'Chrono Diver -PENDULUMs-','196',2222,'物量、デニム、トリル、二重階段','NOTES'],
+    [20,'Confiserie','185',1833,'二重階段、終盤発狂、ラス殺し','PEAK'],
+    [18,'Dances with Snow Fairies(L)','154',2135,'CN、物量、微縦連','PEAK'],
+    [20,'Elemental Creation','212',2130,'同時押し、二重乱打、軸、高速皿、縦連','CHORD'],
+    [25,'EMERALDAS','88-176(176)',1833,'HCN、HBSS、トリル、ソフラン、連皿、終盤難','PEAK'],
+    [27,'Everlasting Message','230',1970,'CN','CHARGE'],
+    [24,'Go Ahead!!','200',1413,'中盤発狂、終盤易化','PEAK'],
+    [26,'GO OVER WITH GLARE -ROOTAGE 26-','170',2000,'皿絡み、発狂、ラス殺し','CHORD'],
+    [29,'hard-wired','208',1901,'HCN、終盤難','PEAK'],
+    [15,'ICARUS(L)','126-251(176)',2000,'ソフラン、中盤難、乱打、トリル','SOF-LAN'],
+    [21,'IX','198',2007,'階段、二重階段、CN、BSS、連皿、ラス殺し','NOTES'],
+    [21,'KAISER PHOENIX(L)','170',2026,'高密度、二重階段、縦連打','NOTES'],
+    [27,'Lost Souls(L)','185',2000,'物量、トリル','NOTES'],
+    [28,'MEGAERA','206',1790,'CN','PEAK'],
+    [27,'Override(L)','175',2204,'物量、皿複合','CHORD'],
+    [18,'perditus\u2020paradisus','172',2065,'CN、階段、ラス殺し','NOTES'],
+    [19,'Phoenix(L)','176',2027,'BSS、高密度','NOTES'],
+    [21,'Sigmund','200',2029,'CN、階段、連皿、ラス殺し','NOTES'],
+    [28,'Sinus Iridum','128-256(128)',1803,'CN、ソフラン','CHARGE'],
+    [14,'TRANOID(L)','130-190(130)',1546,'CN、ソフラン','NOTES'],
+    [26,'X-DEN','200',2220,'中盤発狂、トリル、デニム、連皿、HARD地雷','PEAK'],
+    [30,'Xerulean','182',1802,'HBSS、連皿、デニム、ラス殺し','PEAK'],
+    [22,'共鳴遊戯の華','190',2000,'CN','CHARGE'],
+    [22,'千年ノ理(L)','153',2183,'CN','CHORD'],
+    [13,'嘆きの樹','160',2000,'繰り返し乱打、同時押し、デニム発狂、螺旋階段発狂、後半難','PEAK'],
+    [20,'お米の美味しい炊き方、そしてお米を食べることによるその効果。(L)','190',1907,'トリル','NOTES'],
+    [30,'栄冠のカンパネラ','185',2000,'CN、高密度','CHARGE'],
+    [23,'駅猫のワルツ','282',1558,'高速階段、ラス殺し','NOTES'],
+    [24,'焔極OVERKILL','192',1901,'連皿','NOTES'],
+    [22,'表裏一体！？怪盗いいんちょの悩み(L)','165',2334,'連皿複合、物量','CHORD'],
+  ]},
+  {id:'ks', name:'個人差S',  color:'#e0b800', songs:[
+    [24,'BroGamer(L)','207',2383,'皿複合、同時押し、物量','CHORD'],
+    [28,'\u30c7\u30a3\u30b9\u30b3\u30eb\u30c7\u30a3\u30a2','180-280(280)',2073,'CN、縦連打','CHARGE'],
+    [27,'EROICA','200',2040,'HCN、極短CN','PEAK'],
+    [31,'Level 5','185',1937,'連皿、CN、BSS、トリル','SCRATCH'],
+    [27,'Lords Of The Roundtable','174',1586,'HCN、BSS、連皿','SCRATCH'],
+    [15,'Time to Air(L)','191',1888,'同時押し、連皿、ラス殺し','CHORD'],
+    [20,'Timepiece phase II (CN Ver.)','287',1546,'CN、縦連','CHARGE'],
+    [29,'WHA','108',1946,'HBSS、HCN、連皿','SCRATCH'],
+  ]},
+  {id:'ja', name:'地力A+',   color:'#c080ff', songs:[
+    [17,'Almagest','178',1629,'CN、BSS、階段','CHARGE'],
+    [31,'Ambivalent Vermilia','185',2132,'軸、皿複合','NOTES'],
+    [21,'Ancient Scapes(L)','178',2198,'二重トリル、階段、ラス殺し','NOTES'],
+    [15,'Anisakis -somatic mutation type"Forza"-(L)','185',1971,'物量、トリル、同時','CHORD'],
+    [16,'B4U(BEMANI FOR YOU MIX)(L)','170',2360,'物量、同時、皿複合','CHORD'],
+    [30,'Bad Encryption','200',1633,'CN、BSS、皿複合、連皿、軸押し','PEAK'],
+    [23,'Blue Spring Express','172',1728,'局所難、ラス殺し','PEAK'],
+    [31,'CADENZA','160',2357,'物量、連皿','NOTES'],
+    [22,'CHRONO DIVER -NORNIR-(L)','185',2233,'物量','CHORD'],
+    [26,'CODE:0(L)','125',1829,'連皿、連打','PEAK'],
+    [13,'CONTRACT(L)','180',1418,'階段、ラス殺し','PEAK'],
+    [27,'Dans la nuit de l\'eternite','244',1830,'高速二重階段','PEAK'],
+    [22,'EBONY & IVORY(L)','113-170(170)',1887,'ソフラン、トリル','NOTES'],
+    [31,'Glitch N Ride','30-300(150)',1389,'CN、BSS、ソフラン','SOF-LAN'],
+    [28,'Ignis\u2020Irae','188-191(191)',1970,'CN','CHARGE'],
+    [25,'Initiation','160',2018,'HCN、HBSS、乱打、縦連','CHORD'],
+    [27,'LIGHTNING STRIKES(L)','174',2123,'CN、BSS、物量','NOTES'],
+    [30,'LOUDER ROLLING THUNDER','180',1767,'HCN、HBSS','NOTES'],
+    [23,'NZM','190',1783,'HCN、階段','CHARGE'],
+    [18,'PARADISE LOST','200',1718,'CN、乱打、皿、ラス殺し','CHARGE'],
+    [24,'Quakes','190',1654,'HCN、ラス殺し','PEAK'],
+    [25,'REVOLVER(L)','160',1731,'CN','CHARGE'],
+    [32,'Satellite Burst','177',2000,'CN、階段、二重トリル、デニム','NOTES'],
+    [20,'Saturn(L)','155',1783,'縦連、ラス殺し','PEAK'],
+    [25,'\u30b7\u30e0\u30eb\u30b0\u306e\u76ee\u9187\u3081','190',1822,'皿複合、高速トリル','PEAK'],
+    [27,'Smashing Wedge','215',1957,'BSS、ゴミ付二重トリル、後半難','NOTES'],
+    [31,'SOLAR ECLIPSE','195',1893,'HCN、連皿','NOTES'],
+    [29,'SOLID WYVERN(L)','165',1999,'終盤難、皿絡み、BSS','NOTES'],
+    [27,'THE F\u2200UST','170',1851,'ラス殺し','PEAK'],
+    [28,'Tiempo Loco','180',1884,'CN、BSS','NOTES'],
+    [14,'VANESSA(L)','185',1771,'二重階段、皿','NOTES'],
+    [30,'The Clown of 24stairs','204',1788,'二重階段','NOTES'],
+    [30,'VØID','80-170(164)',1712,'CN、BSS、MSS、ソフラン','SOF-LAN'],
+    [26,'voltississimo','225',1888,'高速、二重配置、同時押し','NOTES'],
+    [31,'Vulnerability','167',1885,'HCN、HBSS、連皿、終盤難','NOTES'],
+    [30,'\uff3b \uff3dDENTITY','200',2000,'BSS、局所難','NOTES'],
+    [28,'\u2200','180',1802,'ラス殺し','PEAK'],
+    [28,'-65\u2103','186',1912,'CN','NOTES'],
+    [27,'\u304c\u3063\u3064\u308a\u9670\u30ad\u30e3!? 怪盗いいんちょの億劫^^;','185',2192,'皿絡み、物量','NOTES'],
+    [19,'恋する☆宇宙戦争っ！！(L)','200',2355,'CN、物量','NOTES'],
+    [22,'超青少年ノ為ノ超多幸ナ超古典的超舞曲(L)','150',2110,'高密度乱打、高速トリル','NOTES'],
+    [21,'煉獄のエルフェリア','183',2000,'中盤発狂','PEAK'],
+  ]},
+  {id:'ka', name:'個人差A+', color:'#a060df', songs:[
+    [19,'BLACK.by X-Cross Fade','163',1738,'高速皿、同時押し、ラス殺し','SCRATCH'],
+    [24,'ECHIDNA','146',1775,'HCN','CHARGE'],
+    [21,'invoker(L)','195',1851,'乱打、軸、連皿、皿複合','NOTES'],
+    [28,'Level 3','175',1844,'BSS、連皿','SCRATCH'],
+    [30,'Level 4','180',1883,'連皿、皿複合、BSS、CN','SCRATCH'],
+    [26,'Red. by Jack Trance','160',1862,'連皿、BSS、皿複合','SCRATCH'],
+    [22,'Reflux','150',1574,'CN、BSS','CHARGE'],
+    [27,'SCREW // owo // SCREW','114',1567,'高速連皿','SCRATCH'],
+    [25,'The Chase','142',1148,'連皿、24分連皿、連皿+トリル、BSS','SCRATCH'],
+    [28,'THE PEERLESS UNDER HEAVEN','170',1818,'連皿','PEAK'],
+    [20,'Thor\'s Hammer','150',1641,'皿複合、縦連、二重階段、坂譜面','PEAK'],
+    [19,'TITANS RETURN(L)','97-194(194)',1377,'HCN、ソフラン','CHARGE'],
+    [29,'TOMAHAWK','215',1830,'連皿','SCRATCH'],
+    [20,'Zirkfied','210',1968,'乱打、デニム、縦連、ラス殺し、所見殺し','PEAK'],
+    [23,'真 地獄超特急 -HELL or HELL-','165',1727,'HCN、連皿、皿複合','CHARGE'],
+    [29,'ピアノ独奏無言歌 "灰燼"','100-200(150)',1977,'ソフラン','SOF-LAN'],
+  ]},
+  {id:'jaa', name:'地力A',   color:'#5599ff', songs:[
+    [29,'ABSOLUTE EVIL','200',1778,'HCN','CHARGE'],
+    [29,'ALTERNATOR','185',1907,'BSS、MSS','CHORD'],
+    [27,'Artist','165',1870,'CN、縦連打','NOTES'],
+    [17,'Bad Maniacs','195',1656,'軸押し、乱打','PEAK'],
+    [27,'BEAT PRISONER','155',1844,'3～5本同時CN、連皿','CHARGE'],
+    [28,'BLACK or WHITE?','185',2013,'CN','NOTES'],
+    [15,'Blue Rain(L)','144',1702,'高密度、終盤難、乱打','PEAK'],
+    [21,'Close the World feat.a\u2606ru(L)','188',1983,'高密度、二重階段','NOTES'],
+    [28,'COSMIC RAY','195',1509,'CN','NOTES'],
+    [25,'DEATH\u2020ZIGOQ \uff5e怒りの高速爆走野郎\uff5e','200',2075,'皿複合、乱打、CN、トリル','NOTES'],
+    [31,'Demon March','174',1875,'HCN、HBSS','NOTES'],
+    [22,'Despair of ELFERIA','205',2096,'同時押し、二重階段、ラス殺し','CHORD'],
+    [23,'Devil\'s Gear','180',1793,'終盤発狂','PEAK'],
+    [24,'DORNWALD \uff5eJunge\uff5e','169',1903,'縦連','PEAK'],
+    [23,'Dynamite','100',1953,'CN・BSS、皿複合','CHORD'],
+    [21,'Elektrick U-Phoria(L)','180',2050,'HCN、物量','NOTES'],
+    [17,'EXUSIA','188',1964,'乱打、軸、ラス殺し','NOTES'],
+    [21,'Feel The Beat(L)','175',2225,'前半難、乱打、皿複合','PEAK'],
+    [15,'four pieces of heaven(L)','125-195(195)',1518,'高密度、ソフラン、低速','PEAK'],
+    [17,'G59','170',2000,'デニム、軸押し、高速小階段','CHORD'],
+    [13,'Ganymede(L)','72-82(82)',1356,'ズレ、階段、終盤難','PEAK'],
+    [24,'GuNGNiR','222',2081,'高速階段、皿複合','NOTES'],
+    [24,'HADES','155',1601,'同時押し、皿複合、ラス殺し','PEAK'],
+    [19,'HAERETICUS','208',1589,'乱打、皿複合、全体難','PEAK'],
+    [21,'KAISER PHOENIX','170',1693,'軸、二重階段、トリル、縦連','NOTES'],
+    [25,'Life Is A Game ft.DD"ナカタ"Metal','195',1775,'ラス殺し','PEAK'],
+    [28,'LOCUS OF THE TRAVEL','182',1920,'CN、連皿','CHARGE'],
+    [15,'MENDES','168',1831,'前半難、高密度発狂、皿複合','PEAK'],
+    [32,'NOIXIA','165',2027,'CN、MSS、二重階段、二重カプセル配置、X譜面','CHARGE'],
+    [26,'Painful Fate','192',1702,'CN、乱打','CHARGE'],
+    [17,'quell\uff5ethe seventh slave\uff5e','162',1646,'局所発狂、皿複合','NOTES'],
+    [16,'Secrets(L)','150',2116,'皿複合、ラス殺し','CHORD'],
+    [17,'SOLID STATE SQUAD(L)','155',1868,'HCN','CHORD'],
+    [30,'suspicions','153',1908,'ラス殺し','NOTES'],
+    [27,'THE BRAVE MUST DIE','215',2075,'CN、物量','CHORD'],
+    [26,'The Rebellion of Sequencer','300',1634,'軸、局所発狂','NOTES'],
+    [23,'Triple Counter','216',2016,'CN','CHORD'],
+    [27,'TRIUMPH','183',1724,'CN、BSS','CHARGE'],
+    [21,'Verflucht','180',1805,'二重階段、二重トリル','NOTES'],
+    [23,'Violet Pulse(L)','134',2115,'高密度、微縦連','NOTES'],
+    [30,'VOLAQUAS','212',1982,'CN、BSS','NOTES'],
+    [13,'waxing and wanding(L)','191',2000,'物量、軸','CHORD'],
+    [23,'ZEPHYRANTHES(L)','180',1982,'CN、皿絡み','NOTES'],
+    [25,'255','255',1676,'トリル、軸、皿絡み、ガチ押し','NOTES'],
+    [23,'紫陽花 -AZISAI-(L)','155',1815,'CN、BSS、MSS、二重階段、中盤難','NOTES'],
+    [26,'お菓子の王国','190',2109,'物量、ズレ、中盤発狂、終盤発狂','PEAK'],
+    [27,'俺ら東京さ行ぐだ(L)','110-150(150)',1874,'CN、BSS、連皿、ソフラン','NOTES'],
+    [20,'仮想空間の旅人たち(L)','151',1943,'終盤難','CHORD'],
+    [27,'華麗なる大犬円舞曲','60-147(142)',1849,'ソフラン','NOTES'],
+    [19,'君のハートにロックオン(L)','260',1828,'局所難','NOTES'],
+    [26,'金野火織の金色提言','225',1630,'高速、軸、皿絡み、ラス殺し','PEAK'],
+    [28,'世界の果てに約束の凱歌を -ReUnion-','200',1983,'CN、軸、ラス殺し','CHORD'],
+    [19,'天空の夜明け','150',2072,'高密度乱打、縦連','NOTES'],
+    [28,'伐折羅-vajra-','173',1877,'終盤難','NOTES'],
+    [27,'ピアノ協奏曲第1番"蠍火" (BlackY Remix)','160',1926,'CN、ラス殺し','PEAK'],
+    [28,'二人ノ廃城幽踊宴','280-316(290)',1927,'ソフラン、階段、トリル','NOTES'],
+    [29,'烽火連天の刃','190',1771,'CN','CHARGE'],
+    [28,'閠槞彁の願い','180',1613,'HCN','PEAK'],
+    [12,'冥','66-200(200)',2000,'階段、ソフラン、中盤加速発狂','SOF-LAN'],
+  ]},
+  {id:'kaa', name:'個人差A',  color:'#3377dd', songs:[
+    [17,'AIR RAID FROM THA UNDAGROUND(L)','180',1523,'トリル','PEAK'],
+    [11,'ピアノ協奏曲第１番"蠍火"','165-185(185)',1414,'階段、皿、縦連、ラス殺し','SOF-LAN'],
+    [12,'Scripted Connection\u21d2 A mix(L)','151',1749,'対称、微縦連、ラス殺し','PEAK'],
+    [15,'STEEL NEEDLE(L)','205',1701,'前半難、トリル、軸押し','PEAK'],
+    [16,'3y3s','191',1871,'序盤発狂、皿複合、二重カプセル配置、前半難','PEAK'],
+    [20,'音楽','210-360(245)',1487,'縦連、ソフラン','SOF-LAN'],
+    [20,'カジノファイヤーことみちゃん(L)','230',1777,'CN、BSS、皿絡み','NOTES'],
+    [21,'Miracle 5ympho X(L)','210',1551,'BSS、MSS、高速連皿','SCRATCH'],
+    [26,'Level One','173',1857,'連皿、皿複合、CN、乱打','SCRATCH'],
+    [28,'バッド・スイーツ、バッド・ドリーム','220',1862,'HCN、BSS、皿絡み','SCRATCH'],
+    [29,'2 Beasts Unchained','175',1780,'連皿','NOTES'],
+    [29,'Don\'t believe the hype','210',1666,'HCN、連皿','SCRATCH'],
+    [29,'Purple Perplex','150',1578,'CN、BSS、MSS、連皿','SCRATCH'],
+    [30,'TECHNOPHOBIA','152',1544,'中盤難','PEAK'],
+    [31,'Cult Invitation','164',1804,'連皿、トリル','SCRATCH'],
+  ]},
+  {id:'jb', name:'地力B+',   color:'#44cc88', songs:[
+    [10,'One More Lovely','200',1452,'螺旋、乱打、ラス殺し','PEAK'],
+    [12,'Twelfth Style(L)','160',1684,'乱打、連皿、デニム、対称','PEAK'],
+    [15,'NEW GENERATION -もう、お前しか見えない-(L)','165',1895,'中盤発狂、トリル','PEAK'],
+    [19,'The Limbo','200',1701,'乱打、皿複合','NOTES'],
+    [19,'YAKSHA','190',2000,'繰り返し乱打、軸','NOTES'],
+    [20,'JOMANDA','90-300(195)',1918,'ソフラン、乱打、終盤難','SOF-LAN'],
+    [20,'SYNC-ANTHEM','160-166(160)',1865,'乱打、ソフラン、長いラス殺し','NOTES'],
+    [20,'キャトられ恋はモ～モク','196',1988,'乱打、軸、皿複合','NOTES'],
+    [20,'†渚の小悪魔ラヴリィ～レイディオ†(IIDX EDIT)','190',1835,'乱打、同時押し、軸押し、皿複合','NOTES'],
+    [21,'ALBA-黎明-(L)','165',1990,'CN、BSS','CHORD'],
+    [21,'海神(L)','159',1830,'CN、BSS','CHARGE'],
+    [22,'fallen leaves -IIDX edition-','165',1745,'CN','NOTES'],
+    [22,'Shooting Fireball','160',1983,'乱打、縦連','NOTES'],
+    [22,'TOXIC VIBRATION','197',1933,'トリル、階段','NOTES'],
+    [23,'Grand Chariot','191',1775,'乱打、皿複合','NOTES'],
+    [23,'STARLIGHT DANCEHALL(L)','177',1712,'連皿、皿絡み、ラス殺し','NOTES'],
+    [23,'StrayedCatz','303',1490,'階段','PEAK'],
+    [24,'Snakey Kung-fu','156',1751,'HCN、乱打','CHARGE'],
+    [24,'津軽雪','160',1953,'縦連、局所難','PEAK'],
+    [25,'ANCHOR','180',1835,'乱打、CN','PEAK'],
+    [25,'Antigravity','222',1591,'HBSS、高速','NOTES'],
+    [25,'DEADHEAT','200',1721,'皿絡み','NOTES'],
+    [25,'O/D*20(L)','155',1984,'CN、皿絡み、物量','NOTES'],
+    [25,'東京神話','196',1505,'局所発狂','PEAK'],
+    [26,'Macho Monky','150',1588,'リズム難、連皿、ラス殺し','PEAK'],
+    [26,'Unbelief','135',1675,'乱打、ズレ、CN','CHARGE'],
+    [26,'Visterhv','191',1869,'乱打、終盤難','NOTES'],
+    [26,'抱きしめてモナムール','190',2110,'乱打、軸、二重階段','NOTES'],
+    [27,'ORCA','155',1795,'終盤難','NOTES'],
+    [28,'Empire of Fury','204',1700,'皿絡み、軸','NOTES'],
+    [29,'GRAVITON','185',1762,'二重トリル、終盤難','NOTES'],
+    [29,'PLASMA SOUL NIGHT feat. Nana Takahashi / 709sec.','178',2271,'物量、皿複合','CHORD'],
+    [30,'kors k\'s How to make OTOGE CORE \u300cLONG\u300d','190',1863,'CN、BSS、MSS、短CN','NOTES'],
+    [30,'ぞうしょく！？マイデンティティ','200',1851,'CN、繰り返し乱打','NOTES'],
+    [31,'Resonant','182',1864,'HCN、HBSS、ズレ','NOTES'],
+    [31,'Xb10r','200',1833,'CN、MSS','NOTES'],
+    [31,'今宵、ロマンス横丁。','168',1714,'CN、BSS、二重階段','NOTES'],
+    [32,'Drop Syndicate','180',1861,'CN、BSS、連皿、デニム','PEAK'],
+  ]},
+  {id:'kb', name:'個人差B+', color:'#22aa66', songs:[
+    [11,'Be quiet(L)','150',1463,'連皿','SCRATCH'],
+    [16,'Marie Antoinette(L)','205-248(215)',1618,'ソフラン、同時、階段、皿複合','CHORD'],
+    [19,'Snake Stick','145',1447,'連皿、皿複合','SCRATCH'],
+    [20,'Hollywood Galaxy','186',1392,'CN、階段、二重階段','CHARGE'],
+    [20,'STULTI','90-182(182)',1416,'ソフラン、トリル特化','PEAK'],
+    [23,'199024club -Re:BounceKiller-','143',1260,'連皿、終盤難','SCRATCH'],
+    [23,'DIAMOND CROSSING','180',1585,'HCN','CHARGE'],
+    [25,'Boomy and The Boost','174',1826,'複合、ラス殺し','CHORD'],
+    [27,'Inferno of Fomalhaut','150',1701,'CN、高速二重トリル、連皿','PEAK'],
+    [28,'水鏡の異界','168',1661,'CN、連皿','CHARGE'],
+    [29,'GiGaGaHell','250',1687,'縦連、連皿、トリル','PEAK'],
+    [30,'Peaktime Booster','180',1663,'連皿','SCRATCH'],
+    [31,'灼熱Beach Side Bunny (かめりあ\'s "Summertime D\'n\'B" Remix)','174',1647,'連皿、連打','SCRATCH'],
+  ]},
+  {id:'jbb', name:'地力B',   color:'#44ccdd', songs:[
+    [7,'MAX 300','12-300(300)',1429,'デニム','PEAK'],
+    [12,'Little Little Princess(L)','180-212(212)',1946,'同時押し、局所難','CHORD'],
+    [14,'Candy Galy','184',1798,'同時押し、階段、ラス殺し','NOTES'],
+    [15,'THE DEEP STRIKER(L)','173',1778,'縦連','CHORD'],
+    [15,'Ubertreffen(L)','174',1655,'階段、物量、デニム','NOTES'],
+    [16,'BITTER CHOCOLATE STRIKER','165',1990,'同時押し、トリル、中盤発狂、ラス殺し','CHORD'],
+    [16,'Colorful Cookie','180',1773,'繰り返し乱打、軸、同時押し、皿、中盤発狂','PEAK'],
+    [16,'不沈艦CANDY','188',1682,'同時押し、トリル、中盤発狂、ラス殺し','PEAK'],
+    [18,'Dances with Snow Fairies','154',1623,'乱打、縦連、軸、ラス殺し','PEAK'],
+    [18,'reunion','184',1677,'XX譜面、縦連、局所発狂、トリル、階段、全押し','CHORD'],
+    [18,'Session 9 -Chronicles-','182-189(182)',1852,'縦連、階段、二重階段、ソフラン','NOTES'],
+    [19,'A MINSTREL\uff5ever.short-scape\uff5e(L)','114',1954,'CN、同時押し','CHORD'],
+    [19,'QUANTUM TELEPORTATION(L)','152',1845,'乱打','PEAK'],
+    [19,'quaver\u266a','182-186(182)',1745,'トリル、乱打、微ソフラン、ラス殺し','NOTES'],
+    [20,'Devilz Staircase','185',1685,'壁、同時押し、終盤高密度乱打','PEAK'],
+    [20,'neu','199',1999,'同時押し、階段、終盤難','PEAK'],
+    [20,'Proof of the existence','170',1675,'ズレ、トリル、ラス殺し','PEAK'],
+    [20,'Timepiece phase II','287',1665,'軸、縦連','NOTES'],
+    [20,'Valanga','186',1647,'CN、BSS、二重階段','CHARGE'],
+    [20,'たまゆら','180',1407,'同時押し、皿複合、終盤難','PEAK'],
+    [20,'龍と少女とデコヒーレンス(L)','165',1713,'CN、乱打、二重階段','NOTES'],
+    [20,'\u0395\u039b\u03a0\u0399\u03a3(L)','175',1852,'CN、ズレ','NOTES'],
+    [21,'BLUE DRAGON(雷龍RemixIIDX)','188',1727,'同時押し、多重トリル、皿複合','CHORD'],
+    [21,'Close the World feat.a\u2606ru','188',1739,'階段、二重階段','NOTES'],
+    [21,'INSOMNIA','195',1661,'皿、螺旋階段、二重階段、全押し','CHORD'],
+    [21,'ra\'am','111-222(111)',1461,'CN、ソフラン、高速皿複合','PEAK'],
+    [21,'廿(L)','120-160(120)',1731,'皿複合','PEAK'],
+    [21,'轟け！恋のビーンボール！！','180',1834,'階段、皿複合','NOTES'],
+    [22,'Broken Sword','160',1887,'乱打、階段、二重階段、終盤難','NOTES'],
+    [22,'cinder','216',1601,'CN、BSS','PEAK'],
+    [22,'entelecheia','185',1657,'CN、軸、終盤難','NOTES'],
+    [22,'GUILTY(L)','148',1525,'CN、高密度','NOTES'],
+    [22,'Monopole.','201',1729,'CN、BSS、縦連、二重トリル','NOTES'],
+    [22,'少年は空を辿る','140',1729,'開幕発狂、縦連打、CN、BSS、軸、終盤発狂','PEAK'],
+    [22,'リリーゼと炎龍レーヴァテイン','200',1771,'CN、階段、軸','NOTES'],
+    [23,'CODE:1 \uff3brevision1.0.1\uff3d','145',1590,'繰り返し乱打','NOTES'],
+    [23,'M4K3 1T B0UNC3','150',1546,'CN・BSS','CHORD'],
+    [23,'Welcome(L)','170',1701,'HCN','CHORD'],
+    [23,'X','180',1952,'デニム','NOTES'],
+    [23,'refrain','158',1857,'二重階段、ラス殺し','NOTES'],
+    [24,'OTENAMI Hurricane','215',1643,'皿複合','NOTES'],
+    [24,'Sky High','153',1943,'乱打、デニム','NOTES'],
+    [24,'Super Rush','190',1791,'同時押し','CHORD'],
+    [24,'童話回廊','262',1592,'乱打、皿絡み、ラス殺し','NOTES'],
+    [24,'#MAGiCVLGiRL_TRVP_B3VTZ','100',1753,'同時押し、CN、軸、ズレ、ラス殺し','NOTES'],
+    [25,'AA -rebuild-','174',1820,'乱打、局所発狂、デニム','NOTES'],
+    [25,'DropZ-Line-','50-400(200)',1648,'乱打、軸、ソフラン','SOF-LAN'],
+    [25,'Illusionary Waterlily','180',1803,'乱打、皿絡み、CN','NOTES'],
+    [25,'NITROUS CANNON','169',1875,'乱打、皿絡み、縦連打、連皿','NOTES'],
+    [25,'Slipstream','175',1822,'乱打、皿絡み','PEAK'],
+    [25,'Xperanza','200',1637,'CN','SCRATCH'],
+    [25,'神謳 -RESONANCE-','180',2047,'乱打、二重階段','NOTES'],
+    [26,'GENE','163',2183,'乱打、皿複合','NOTES'],
+    [26,'HARD BRAIN','155',1914,'CN','NOTES'],
+    [26,'KILL EACH OTHER','162',1945,'乱打、終盤難','NOTES'],
+    [26,'Xlo','165',1988,'乱打、連皿、トリル','NOTES'],
+    [26,'ruin of opals','220-390(355)',1646,'ソフラン、乱打、縦連打、CN、ズレ、ラスト減速','SOF-LAN'],
+    [27,'LASER CRUSTER (IGNITE REMIX)','174',1824,'CN、BSS、連皿','NOTES'],
+    [27,'T-REX vs Velociraptor (In the Far east euphoria)','200',1636,'CN、二重トリル','NOTES'],
+    [27,'魅惑のYUMMYスイーツ','208',1586,'CN','PEAK'],
+    [28,'ASIAN VIRTUAL REALITIES (MELTING TOGETHER IN DAZZLING DARKNESS)','150',1752,'CN','NOTES'],
+    [28,'Burning Flame(L)','165',1938,'連皿、トリル','NOTES'],
+    [28,'DUAL STRIKER','185',1960,'CN','NOTES'],
+    [28,'Vitrum','146',1848,'CN','NOTES'],
+    [29,'Angel\'s Ladder','155',1800,'乱打、縦連','NOTES'],
+    [29,'Arkadia','180',1873,'皿複合、トリル','NOTES'],
+    [29,'Flying Castle','174',1877,'MSS、CN','NOTES'],
+    [29,'One for All','195',1632,'BSS、連皿','CHORD'],
+    [29,'Smalt #28598F','151',1725,'局所難、二重階段','NOTES'],
+    [29,'Triple Cross','196',1667,'CN','CHARGE'],
+    [30,'BIGWAVERS','177',1796,'CN、BSS、トリル','CHORD'],
+    [30,'I','225',1901,'CN、BSS','NOTES'],
+    [30,'MAX 360','15-360(360)',1610,'CN、同時押し','PEAK'],
+    [30,'24h Endurance Race','184',1743,'短CN、トリル','NOTES'],
+    [30,'儚キ戀ノ幻想譚','175',1808,'BSS、終盤難','NOTES'],
+    [30,'恋愛＝精度×認識力','3-333(177)',1756,'ソフラン、疑似停止','SOF-LAN'],
+    [31,'MAXIMUM CHEAT GIRL','210',1842,'乱打、階段','NOTES'],
+    [31,'The Last Apocalypse','190',1903,'BSS、階段','NOTES'],
+    [31,'Vermilion Carol','175',1837,'CN、皿同時','NOTES'],
+    [31,'電腦都市','240',1738,'同時押し、二重階段','NOTES'],
+    [31,'未完成ノ蒸氣驅動乙女','170',1538,'階段','NOTES'],
+    [32,'Lightspeed','200',1606,'CN、BSS','NOTES'],
+    [32,'destination','175',1698,'CN、トリル','NOTES'],
+    [32,'u gotta beat','180',1806,'連皿、BSS、二重階段','NOTES'],
+  ]},
+  {id:'kbb', name:'個人差B',  color:'#22aacc', songs:[
+    [11,'FAKE TIME','200',1231,'同時押し、高速トリル、ラス殺し','PEAK'],
+    [15,'PARANOiA \uff5eHADES\uff5e','75-300(300)',1395,'ソフラン、トリル','SOF-LAN'],
+    [15,'\u30df\u30e9\u30fc\u30b8\u30e5\u30fb\u30ec\u30b8\u30c7\u30f3\u30b9(L)','144',1676,'CN、軸','CHARGE'],
+    [16,'Y&Co. is dead or alive','145-876(145)',1478,'ソフラン','SOF-LAN'],
+    [17,'Red. by Full Metal Jacket','158',1643,'連皿、皿複合','SCRATCH'],
+    [18,'Watch Out Pt.2','148',1506,'連皿、皿複合','SCRATCH'],
+    [20,'アストライアの双皿','173',1632,'CN、連続二重縦連','NOTES'],
+    [21,'VOX UP','202',1870,'皿、軸、トリル、二重トリル、前半難','CHORD'],
+    [22,'Flashes','180',1691,'CN・BSS、皿複合','NOTES'],
+    [22,'IMPLANTATION','145',1163,'縦連、階段','PEAK'],
+    [24,'火影','136',1437,'連皿','SCRATCH'],
+    [25,'Papilio ulysses','180',1498,'CN、連皿','CHARGE'],
+    [29,'逆月','280',1920,'HCN','CHORD'],
+    [29,'雪上断火','105-180(180)',1544,'連皿、ソフラン','SCRATCH'],
+    [31,'摩天楼','172',1309,'HCN、HBSS、終盤難','CHARGE'],
+    [23,'AO-1','195',1443,'皿複合','NOTES'],
+  ]},
+  {id:'jc', name:'地力C',    color:'#ddcc33', songs:[
+    [11,'spiral galaxy(L)','154',1910,'高密度、乱打、トリル、物量、ラス殺し','NOTES'],
+    [12,'rage against usual','152',1527,'皿複合、中盤発狂、二重階段','PEAK'],
+    [15,'華爛漫 -Flowers-(L)','160',1597,'高密度、同時押し','NOTES'],
+    [16,'Arabian Rave Night(L)','180',1888,'デニム、同時、階段','NOTES'],
+    [16,'THANK YOU FOR PLAYING(L)','45-170(170)',1534,'中盤発狂、乱打','NOTES'],
+    [16,'thunder HOUSE NATION Remix(L)','128',1954,'高密度、同時','CHORD'],
+    [17,'DOMINION','196',1636,'軸、同時押し、中盤発狂','PEAK'],
+    [17,'Evans','185',1440,'皿複合、軸、ラス殺し','NOTES'],
+    [17,'GOLDEN CROSS','150',1765,'繰り返し乱打','NOTES'],
+    [19,'NNRT','101-202(101)',1780,'ソフラン、同時押し、乱打','CHORD'],
+    [19,'WONDER WALKER','165',1921,'乱打','NOTES'],
+    [19,'yellow head joe(L)','187',1596,'CN、皿同時','NOTES'],
+    [19,'子供の落書き帳','280',1395,'軸、序盤発狂、トリル','PEAK'],
+    [20,'DAY DREAM','80-300(80)',1075,'ソフラン、縦連','SOF-LAN'],
+    [20,'Sol Cosine Job 2','190-200(190)',1625,'乱打、皿複合、ソフラン、BSS','NOTES'],
+    [20,'シュレーディンガーの猫','187',1717,'乱打、階段、皿複合','NOTES'],
+    [20,'トリカゴノ鳳凰','185',1932,'CN、微縦連、皿複合','NOTES'],
+    [21,'Ancient Scapes','178',1780,'乱打、軸、ラス殺し','NOTES'],
+    [21,'DARK LEGACY','196',1828,'皿絡み、乱打','CHORD'],
+    [21,'Idola','201',1826,'デニム','CHORD'],
+    [21,'Last Dance','150',1650,'BSS、高速トリル、乱打','PEAK'],
+    [21,'疾風迅雷','180',1493,'乱打、軸、縦連打、終盤難','NOTES'],
+    [21,'旋律のドグマ\uff5eMiserables\uff5e','192',2002,'乱打','NOTES'],
+    [22,'Cosmic Cat(L)','160',1651,'CN、同時押し','CHORD'],
+    [22,'EBONY & IVORY','170',1520,'乱打、皿絡み','NOTES'],
+    [22,'FANTASTIC THREE','185',1649,'連皿、二重階段','NOTES'],
+    [22,'Gravigazer','160',1533,'BSS','NOTES'],
+    [22,'Invitation from Mr.C','230',1405,'CN、BSS','NOTES'],
+    [22,'NEO GENERATOR SEVEN','182',1690,'軸、皿複合','CHORD'],
+    [22,'Sounds Of Summer','175',1513,'トリル','CHORD'],
+    [22,'We\'re so Happy (P*Light Remix) IIDX ver.','185',1896,'乱打、皿複合','NOTES'],
+    [22,'それは花火のような恋','182',1976,'皿複合','NOTES'],
+    [22,'夏色DIARY - L.E.D.-G STYLE MIX -','190',1590,'CN','NOTES'],
+    [23,'Godspeed','165',1631,'HCN、縦連打','NOTES'],
+    [23,'Konzert V','160',1710,'デニム、局所難','PEAK'],
+    [23,'Nightmare before oversleep','190',1500,'階段、X譜面','PEAK'],
+    [23,'めいさいアイドル☆あいむちゃん♪','160',1717,'階段、皿複合','NOTES'],
+    [24,'Amazing Mirage(L)','153',1684,'乱打、皿絡み','CHORD'],
+    [24,'FUZIN RIZIN','190',1929,'皿絡み、乱打','NOTES'],
+    [24,'RAIN','159',1657,'CN、乱打','NOTES'],
+    [24,'SAY BAY','165',1455,'CN、BSS、連皿、皿複合、二重階段','SCRATCH'],
+    [24,'イザナミノナゲキ','195',1661,'CN、同時押し、階段、ズレ','NOTES'],
+    [26,'Dr. Chemical & Killing Machine','165',1700,'乱打','NOTES'],
+    [26,'L.F.O','180',1687,'軸、ラス殺し','PEAK'],
+    [26,'Lethal Weapon','90-180(180)',1646,'乱打、高速階段、ソフラン','NOTES'],
+    [26,'LOST TECHNOLOGIE','157',1822,'乱打、ズレ、CN','NOTES'],
+    [26,'THE DAY OF JUBILATIONS','181',1757,'乱打、CN','NOTES'],
+    [26,'dAuntl3ss','166',1775,'乱打、ラス殺し','NOTES'],
+    [26,'龍王の霊廟(Mausoleum Of The Primal Dragon)(L)','144',2023,'CN','CHARGE'],
+    [27,'AKASHIC BREAK','205',1823,'皿絡み','CHORD'],
+    [27,'Friction\uff3b!\uff3dFunction','150',1634,'CN、BSS、皿絡み、二重階段','NOTES'],
+    [27,'Rave Patroller','175',1705,'ラス殺し','PEAK'],
+    [27,'TECHNO Style Essentials','154',1453,'CN','NOTES'],
+    [27,'Vinculum stellarum','160',1873,'CN、局所発狂','NOTES'],
+    [27,'Ypsilon(L)','160',1801,'乱打','NOTES'],
+    [27,'深淵に捧ぐレクイエム','175',1537,'CN','CHARGE'],
+    [28,'SOLID STATE SQUAD -RISEN RELIC REMIX-','186',1670,'CN','NOTES'],
+    [28,'Viridian','161',1700,'乱打','NOTES'],
+    [28,'innocent revolver','310',1990,'階段、縦連','NOTES'],
+    [28,'rommmo','208',1762,'二重トリル、前半難','CHORD'],
+    [29,'Aftermath','200',1828,'HCN、軸','CHARGE'],
+    [29,'LIVE DRIVING!! feat. 花たん','190',1947,'皿複合','CHORD'],
+    [29,'Push on Beats!\uff5e音ゲの国のeX-ストリーマー\uff5e','164-172(168)',1748,'縦連、デニム','NOTES'],
+    [29,'禊','160',1631,'CN','CHARGE'],
+    [30,'Always We Trust In You','190',1625,'CN、皿複合','NOTES'],
+    [30,'Chaotoxin','180',1705,'乱打、連皿','PEAK'],
+    [30,'Ou Legends','191',1687,'CN、BSS','NOTES'],
+    [30,'RINNE','198',1788,'乱打','CHORD'],
+    [30,'Super Freak','200',1754,'乱打','NOTES'],
+    [30,'anthracene','168',1744,'CN、皿絡み、連打','NOTES'],
+    [31,'Ghost Pulse','165',1409,'CN、乱打','PEAK'],
+    [31,'Million Dollar','180',1762,'CN、階段','NOTES'],
+    [31,'Seven Times Four','170',1763,'皿絡み','NOTES'],
+    [31,'Sword of Vengeance','208',1650,'CN、乱打','NOTES'],
+    [31,'電光','165',1560,'CN、BSS、連皿','NOTES'],
+    [32,'COSMIC V3LOCITY','200',1716,'CN','NOTES'],
+    [32,'DIVINE JUDGEMENT','190',1416,'CN、BSS、二重階段','CHARGE'],
+    [32,'EX-MASSIVE FIGHTER','165',1725,'微縦連','CHORD'],
+    [32,'Here We Go Now','170',1690,'CN、BSS、連皿、終盤難','CHORD'],
+    [32,'Roar of Chronos','175',1991,'CN、BSS','NOTES'],
+  ]},
+  {id:'kc', name:'個人差C',  color:'#bbaa11', songs:[
+    [8,'PLEASE DON\'T GO','135',1251,'皿、縦連、局所難、ラス殺し','PEAK'],
+    [14,'Sense 2007','140',1517,'縦連、皿複合、局所難、ラス殺し','PEAK'],
+    [18,'New Castle Legions','120-180(120)',1418,'ソフラン、CN','SOF-LAN'],
+    [21,'Adularia','180',1449,'CN、ラス殺し(二重階段)','CHARGE'],
+    [21,'MAD ATTACK(L)','140',1396,'BSS、MSS、連皿、皿複合、トリル','SCRATCH'],
+    [21,'海神','159',1629,'CN、皿複合','CHARGE'],
+    [22,'BLUE MIRAGE','170',1606,'皿複合','SCRATCH'],
+    [22,'Rave*it!! Rave*it!!','282',1656,'CN、同時押し特化、多重軸、全押し','CHORD'],
+    [22,'ZZ','154',1541,'CN、二重階段','NOTES'],
+    [24,'TOGAKUSHI','152',1343,'HCN','CHARGE'],
+    [26,'ONIGOROSHI','400',1541,'軸、HBSS','NOTES'],
+    [27,'Level 2','150',1488,'BSS、連皿','SCRATCH'],
+    [28,'スーパー戦湯ババンバーン','187',1755,'2連皿','NOTES'],
+    [29,'ハイテックトキオ(L)','165',1657,'MSS','NOTES'],
+    [30,'B.O.D.Y.','157',1734,'MSS','NOTES'],
+    [31,'GAME ON','105',1386,'CN、BSS、連皿','SCRATCH'],
+  ]},
+  {id:'jd', name:'地力D',    color:'#ff8844', songs:[
+    [5,'V','150',1519,'デニム、トリル','PEAK'],
+    [11,'AA','154',1834,'同時押し、乱打、階段、局所発狂、全体難','NOTES'],
+    [12,'Scripted Connection\u21d2 A mix','151',1575,'乱打、対称、トリル、縦連','NOTES'],
+    [12,'Scripted Connection\u21d2 H mix(L)','151',1466,'縦連、同時、階段、ラス殺し、乱打、皿絡み','PEAK'],
+    [13,'カゴノトリ\uff5e弐式\uff5e','140',1325,'同時押し、乱打、終盤難','PEAK'],
+    [13,'華蝶風雪(L)','199',2014,'同時押し、軸','CHORD'],
+    [14,'FIRE FIRE','150',1405,'皿、二重階段、ラス殺し','PEAK'],
+    [14,'電人、暁に斃れる。','165',1725,'乱打、縦連、局所難','NOTES'],
+    [15,'oratio','162',1493,'裏軸押し、終盤難','PEAK'],
+    [16,'Go Beyond!!','200',1166,'中盤発狂、終盤易化','PEAK'],
+    [16,'Kung-fu Empire(L)','177',1999,'高密度、階段','CHORD'],
+    [17,'SOLID STATE SQUAD','155',1819,'皿、トリル、軸、中盤発狂','PEAK'],
+    [18,'ALBIDA','185',1530,'同時押し、乱打、軸、皿複合','CHORD'],
+    [18,'Broken','148',1598,'乱打、デニム','PEAK'],
+    [19,'fffff','138',1624,'二重階段、高速トリル','NOTES'],
+    [19,'The Sampling Paradise','150',1545,'乱打、連皿、CN、BSS','NOTES'],
+    [19,'Thunderbolt','188',1911,'乱打','CHORD'],
+    [19,'恋する☆宇宙戦争っ！！','200',1835,'階段','NOTES'],
+    [19,'聖人の塔','97-194(97)',1567,'階段、トリル、ソフラン','SOF-LAN'],
+    [20,'GAIA','180',1676,'乱打、螺旋階段','NOTES'],
+    [20,'True Blue','164',1898,'乱打、ラス殺し','NOTES'],
+    [20,'即席！脳直\u2605ミュージックシステム','197',1838,'皿複合、乱打','NOTES'],
+    [20,'狂イ咲ケ焔ノ華','206',1860,'階段、乱打、終盤発狂','PEAK'],
+    [21,'ATHER(L)','24-192(192)',1640,'ソフラン、疑似停止、同時押し','CHORD'],
+    [21,'Feel The Beat','175',1830,'皿複合','NOTES'],
+    [21,'PUNISHER','180',1812,'乱打、デニム','NOTES'],
+    [22,'Beat Radiance(L)','192',1809,'同時押し','CHORD'],
+    [22,'Say YEEEAHH','135',1677,'同時押し','CHORD'],
+    [22,'SpaceLand\u2606TOYBOX','172',1501,'乱打、階段','NOTES'],
+    [22,'The Least 100sec','200-264(264)',1505,'二重階段、トリル、ソフラン','NOTES'],
+    [22,'TIEFSEE','165',1752,'乱打','NOTES'],
+    [22,'表裏一体！？怪盗いいんちょの悩み','165',1815,'二重階段、皿複合','NOTES'],
+    [23,'Highcharge Divolt','200',1421,'HCN','NOTES'],
+    [23,'POSSESSION','23-185(185)',1521,'CN、ソフラン、同時押し','SOF-LAN'],
+    [23,'紫陽花 -AZISAI-','155',1490,'CN、二重階段、終盤難','PEAK'],
+    [24,'九尾狐夜行','145',1521,'高速トリル','CHORD'],
+    [24,'Rave Cannon','160',1700,'乱打、CN、BSS','NOTES'],
+    [24,'Umbral(L)','138',1566,'HCN','CHARGE'],
+    [24,'刃図羅','165',1746,'乱打、皿絡み','NOTES'],
+    [24,'〆','160',1877,'BSS、乱打、連皿、皿複合','CHORD'],
+    [25,'Persephone','155',1539,'連皿、二重階段','NOTES'],
+    [25,'Rampage','195',1831,'同時押し、BSS、乱打、ラス殺し','CHORD'],
+    [26,'Catch Our Fire!','190',1885,'乱打、皿絡み','NOTES'],
+    [26,'Drastic Dramatic','166',1765,'乱打','NOTES'],
+    [26,'DRUNK MONKY','145',1177,'軸押し','NOTES'],
+    [26,'EVANESCENT','127-165(161)',1845,'乱打、CN、ソフラン','NOTES'],
+    [26,'Trill auf G','188',1670,'乱打、中盤難','NOTES'],
+    [26,'最小三倍完全数','220',1314,'高速、XX譜面','NOTES'],
+    [27,'Double Dribble','210',1683,'皿絡み、高速二重トリル','SCRATCH'],
+    [27,'Matt Silver','146',1707,'皿絡み、縦連、繰り返し乱打','NOTES'],
+    [27,'Megalara Garuda','180',1543,'CN','PEAK'],
+    [28,'BIGソムタム','187',1688,'CN','CHARGE'],
+    [28,'Parvati','205',1467,'トリル、階段、終盤難','PEAK'],
+    [29,'Fegrix','175',1687,'連皿','NOTES'],
+    [29,'Silver Bullet','152-172(168)',1662,'ソフラン','SOF-LAN'],
+    [29,'天邪鬼','155',1693,'BSS、壁','NOTES'],
+    [30,'Meissa','124-174(174)',1435,'CN、乱打','PEAK'],
+    [30,'No Border','150',1895,'乱打、後半難','NOTES'],
+    [30,'ONE AND ONLY','174',1639,'連皿、デニム、X譜面','PEAK'],
+    [30,'神のシナリオ','140',1652,'HCN、HBSS','CHARGE'],
+    [30,'#CMFLG','155',1748,'CN、BSS、乱打','NOTES'],
+    [31,'ACT0','185',1534,'BSS、軸、トリル','NOTES'],
+    [31,'BLAZING_LAZER','191',1752,'BSS、階段、トリル','NOTES'],
+    [31,'Dahlia','185',1617,'BSS、二重階段','PEAK'],
+    [31,'Out of Control','185',1598,'CN、トリル、微縦連','NOTES'],
+    [31,'Stereo Beasts','160',1881,'乱打','NOTES'],
+    [31,'frequent','176',1900,'乱打','NOTES'],
+    [32,'Bring The Fire','160',1734,'CN','NOTES'],
+  ]},
+  {id:'kd', name:'個人差D',  color:'#dd6622', songs:[
+    [8,'桜','13-320(300)',1123,'序盤縦連発狂、ソフラン、同時押し','SOF-LAN'],
+    [14,'Fascination MAXX','100-400(100)',1313,'高速、ソフラン、縦連、同時押し','SOF-LAN'],
+    [17,'eRAseRmOToRpHAntOM','135-270(135)',1686,'軸、ソフラン、皿、トリル','CHORD'],
+    [17,'mosaic','188',1509,'同時押し特化','CHORD'],
+    [17,'ワルツ第17番 ト短調"大犬のワルツ"','230-320(300)',1684,'ソフラン、縦連、階段','SOF-LAN'],
+    [24,'Caterpillar','170',1561,'連皿、縦連','SCRATCH'],
+    [28,'Fire Beat','157-300(157)',1392,'ソフラン','NOTES'],
+    [28,'魔法のかくれんぼ','178-208(178)',1454,'CN、ソフラン','CHARGE'],
+    [30,'dica dica','175',1638,'トリル、連皿','NOTES'],
+  ]},
+  {id:'je', name:'地力E',    color:'#ff5566', songs:[
+    [6,'Colors (radio edit)','150',1258,'トリル、乱打、終盤発狂','PEAK'],
+    [9,'moon_child','130-160(146)',1300,'階段、同時押し、ラス殺し','PEAK'],
+    [11,'gigadelic(H)','173',1116,'トリル、ラス殺し','PEAK'],
+    [11,'gigadelic','173',1301,'トリル、皿、ラス殺し','PEAK'],
+    [11,'RED ZONE(L)','165',1566,'乱打','NOTES'],
+    [13,'Concertino in Blue','103-155(140)',1311,'二重階段、皿複合、ソフラン','SOF-LAN'],
+    [14,'LASER CRUSTER','152',1644,'螺旋、階段、皿複合','NOTES'],
+    [14,'VANESSA','185',1228,'皿、二重階段','NOTES'],
+    [15,'少年A','90-192(90)',1449,'ソフラン、階段、皿複合、後半難','PEAK'],
+    [18,'黒髪乱れし修羅となりて','150',1745,'開幕縦連、トリル、乱打','NOTES'],
+    [19,'F','154',1813,'乱打、階段','NOTES'],
+    [19,'Todestrieb','185',1733,'階段、CN','NOTES'],
+    [20,'Liberation','150',1905,'高速トリル、乱打','NOTES'],
+    [20,'Little Star','183',1635,'乱打、階段','NOTES'],
+    [20,'\u0395\u039b\u03a0\u0399\u03a3','175',1600,'乱打','NOTES'],
+    [21,'invoker','195',1624,'乱打、軸','NOTES'],
+    [22,'Symmetry','163',1659,'対称','NOTES'],
+    [22,'千年ノ理','153',1608,'乱打','CHORD'],
+    [22,'紅牡丹','181',1445,'乱打','NOTES'],
+    [23,'NINJA IS DEAD IIDX ver.','111-222(222)',1520,'ソフラン、同時押し','NOTES'],
+    [24,'Apocalypse','165',1814,'CN、階段','NOTES'],
+    [24,'Summerlights(IIDX Edition)','175',1580,'乱打、CN','PEAK'],
+    [24,'Sweet Clapper(L)','162',1485,'CN、同時押し、ラス殺し','CHORD'],
+    [24,'Venom','190',1624,'トリル','CHORD'],
+    [25,'Arca','185',1602,'階段、縦連打','PEAK'],
+    [25,'Raspberry Railgun','142',1606,'皿絡み、二重階段','NOTES'],
+    [25,'encounter','190',1679,'皿絡み、階段、トリル','NOTES'],
+    [26,'Carry Me Away','175',1613,'皿複合、乱打','NOTES'],
+    [26,'Please Welcome Mr.C','230',1522,'ハネリズム、皿複合','CHORD'],
+    [27,'LIGHTNING STRIKES','174',1639,'CN','NOTES'],
+    [30,'Hat Surprise (Season 2)','180',1729,'連皿、同時押し','NOTES'],
+    [30,'KING(L)','166',1983,'同時押し','CHORD'],
+    [30,'glacia','186',1492,'CN','NOTES'],
+    [31,'JUSTICE/GUILTY feat. Nana Takahashi & 709sec.','183',1959,'皿複合、物量','CHORD'],
+    [31,'Sirius','165',1637,'CN、BSS','CHORD'],
+    [31,'The Onlyonez','220',1587,'CN、皿絡み','CHORD'],
+    [31,'\u300apl|rayer\u300b','180',1420,'CN、トリル','CHORD'],
+    [31,'終焔のClaudia','90-185(185)',1406,'軸','NOTES'],
+    [32,'灼熱 Lost Summer Dayz','168',1453,'連皿、CN','SCRATCH'],
+  ]},
+  {id:'ke', name:'個人差E',  color:'#dd3344', songs:[
+    [9,'one or eight','155',1177,'序盤発狂、皿、縦連打','PEAK'],
+    [10,'Innocent Walls(H)','155',1281,'縦連、壁','PEAK'],
+    [10,'Innocent Walls','155',1446,'縦連、壁','PEAK'],
+    [10,'雪月花','151',1287,'乱打、縦連、皿複合、ラス殺し','PEAK'],
+    [12,'SCREAM SQUAD','220',1073,'連皿、皿複合、トリル','PEAK'],
+    [13,'DUE TOMORROW','100-400(400)',1073,'トリル、序盤難、終盤難','PEAK'],
+    [14,'GRID KNIGHT(L)','160',1744,'物量、縦連','CHORD'],
+    [15,'ICARUS','126-251(176)',1301,'ソフラン、中盤加速発狂、トリル','SOF-LAN'],
+    [15,'TROOPERS','177',1496,'皿複合、同時押し','CHORD'],
+    [24,'Steel Edge','177',1604,'HCN','CHARGE'],
+  ]},
+  {id:'jf', name:'地力F',    color:'#9999aa', songs:[
+    [7,'A','93-191(93)',1260,'ソフラン、同時押し、階段','PEAK'],
+    [14,'snow storm(L)','145',1709,'二重階段、ラス殺し','NOTES'],
+    [15,'Ristaccia','160',1386,'同時押し、階段','PEAK'],
+    [18,'SPECIAL SUMMER CAMPAIGN!','168',1509,'同時押し、乱打、デニム','NOTES'],
+    [27,'Primitive Vibes','150',1564,'縦連、CN','NOTES'],
+    [31,'残像ニ繋ガレタ追憶ノHIDEAWAY','160',1789,'乱打','CHORD'],
+    [32,'スパークリング☆彡ハイパーチューン！！','177',1843,'皿同時押し、X譜面','CHORD'],
+  ]},
+  {id:'kf', name:'個人差F',  color:'#777788', songs:[
+    [18,'sakura storm','184',1225,'CN','NOTES'],
+  ]},
+];
+
+/* ── sort each tier by ver ── */
+TIERS.forEach(t => t.songs.sort((a,b) => a[0]-b[0]));
+
+/* ── build side menu ── */
+const mnList = document.getElementById('mn-list');
+mnList.innerHTML = TIERS.map(t =>
+  `<a class="mn-a" href="#${t.id}" onclick="closeMn()">
+    <span class="mn-grade" style="color:${t.color}">${t.name}</span>
+    <span class="mn-n">${t.songs.length}曲</span>
+  </a>`
+).join('');
+
+/* ── build main content ── */
+const mainEl = document.getElementById('main');
+mainEl.innerHTML = TIERS.map(t => {
+  const rows = t.songs.map(([ver,name,bpm,notes,attr,type]) =>
+    `<tr>
+      <td class="cv">${ver}</td>
+      <td class="cn">${esc(name)}</td>
+      <td class="cb">${esc(bpm)}</td>
+      <td class="co">${notes.toLocaleString()}</td>
+      <td class="ca">${esc(attr)}</td>
+      <td class="ct">${badge(type)}</td>
+    </tr>`
+  ).join('');
+
+  return `<section class="ts" id="${t.id}">
+    <div class="th" style="--tc:${t.color}">
+      <h2>${t.name}</h2>
+      <span class="th-n">${t.songs.length}曲</span>
+    </div>
+    <table class="tbl">
+      <colgroup>
+        <col class="cv"><col class="cn"><col class="cb">
+        <col class="co"><col class="ca"><col class="ct">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="cv">ver</th>
+          <th class="cn">曲名</th>
+          <th class="cb">BPM(開幕)</th>
+          <th class="co">notes</th>
+          <th class="ca">属性</th>
+          <th class="ct">タイプ</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </section>`;
+}).join('');
+
+/* ── hamburger / menu logic ── */
+const hbg = document.getElementById('hbg');
+const mn  = document.getElementById('mn');
+const ov  = document.getElementById('ov');
+const mc  = document.getElementById('mc');
+
+function openMn(){
+  mn.classList.add('open');
+  hbg.classList.add('is-open');
+  ov.classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeMn(){
+  mn.classList.remove('open');
+  hbg.classList.remove('is-open');
+  ov.classList.remove('on');
+  document.body.style.overflow='';
+}
+hbg.addEventListener('click', openMn);
+ov.addEventListener('click',  closeMn);
+mc.addEventListener('click',  closeMn);
+</script>
+</body>
+</html>
