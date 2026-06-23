@@ -170,8 +170,9 @@ body{
 .tbl thead th.cb,.tbl thead th.ca,.tbl thead th.ct{text-align:left}
 
 .tbl tbody tr{border-bottom:1px solid #101020}
-.tbl tbody tr:nth-child(even){background:rgba(255,255,255,.012)}
-.tbl tbody tr:hover{background:#141432}
+.tbl tbody tr:not([class]):nth-child(even){background:rgba(255,255,255,.012)}
+.tbl tbody tr:not([class*="st-"]):hover{background:#141432}
+.tbl tbody tr[class*="st-"]:hover{filter:brightness(1.15)}
 .tbl td{
   padding:5px 6px;
   vertical-align:middle;
@@ -218,12 +219,12 @@ td.ca{
 td.ct{white-space:nowrap}
 
 /* ── STATUS ROW COLORS ── */
-tr.st-fc   { background:rgba(200,200,230,0.10) }
-tr.st-ex   { background:rgba(255,210,0,0.10) }
-tr.st-hard { background:rgba(255,70,40,0.10) }
-tr.st-nc   { background:rgba(40,100,255,0.10) }
-tr.st-ec   { background:rgba(40,200,60,0.10) }
-tr.st-fail { background:rgba(10,20,120,0.35) }
+tr.st-fc   { background:#2a2a40 }
+tr.st-ex   { background:#2e2600 }
+tr.st-hard { background:#300a06 }
+tr.st-nc   { background:#061428 }
+tr.st-ec   { background:#061a08 }
+tr.st-fail { background:#04051a }
 
 tr.st-fc   td.cn { color:#d4d4ea; font-weight:600 }
 tr.st-ex   td.cn { color:#ffd700; font-weight:600 }
