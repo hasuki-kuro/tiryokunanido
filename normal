@@ -9,11 +9,11 @@
 
 :root{
   --bg:#08080e;
-  --s1:#0d0d18;
-  --s2:#111120;
-  --bdr:#1c1c34;
-  --txt:#bbbbd4;
-  --dim:#55557a;
+  --s1:#0e0e1c;
+  --s2:#121224;
+  --bdr:#20203a;
+  --txt:#d2d2ea;
+  --dim:#8890b0;
   --hh:50px;
   --mw:264px;
   --mono:'Courier New',Consolas,monospace;
@@ -185,34 +185,107 @@ td.cv{
   text-align:center;
   font-family:var(--mono);
   font-size:12px;
-  color:var(--dim);
+  color:#9898b8;
 }
 td.cn{
   font-size:12px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+  cursor:pointer;
+  user-select:none;
 }
+td.cn:hover{text-decoration:underline;text-decoration-color:rgba(255,255,255,.3)}
 td.cb{
   font-family:var(--mono);
   font-size:12px;
-  color:#8ab0d0;
+  color:#aac8e0;
   white-space:nowrap;
 }
 td.co{
   font-family:var(--mono);
   font-size:12px;
-  color:#8ab0d0;
+  color:#aac8e0;
   text-align:right;
 }
 td.ca{
   font-size:11px;
-  color:var(--dim);
+  color:#8890b0;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 td.ct{white-space:nowrap}
+
+/* ── STATUS ROW COLORS ── */
+tr.st-fc   { background:rgba(200,200,230,0.10) }
+tr.st-ex   { background:rgba(255,210,0,0.10) }
+tr.st-hard { background:rgba(255,70,40,0.10) }
+tr.st-nc   { background:rgba(40,100,255,0.10) }
+tr.st-ec   { background:rgba(40,200,60,0.10) }
+tr.st-fail { background:rgba(10,20,120,0.35) }
+
+tr.st-fc   td.cn { color:#d4d4ea; font-weight:600 }
+tr.st-ex   td.cn { color:#ffd700; font-weight:600 }
+tr.st-hard td.cn { color:#ff6655; font-weight:600 }
+tr.st-nc   td.cn { color:#5599ff; font-weight:600 }
+tr.st-ec   td.cn { color:#44cc66; font-weight:600 }
+tr.st-fail td.cn { color:#4466bb; font-weight:600 }
+
+/* status dot prefix via data attr */
+td.cn[data-st]::before{
+  content:attr(data-dot);
+  display:inline-block;
+  width:8px;height:8px;
+  border-radius:50%;
+  margin-right:6px;
+  vertical-align:middle;
+  flex-shrink:0;
+}
+tr.st-fc   td.cn::before { content:''; display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; vertical-align:middle; background:#c0c0d8 }
+tr.st-ex   td.cn::before { content:''; display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; vertical-align:middle; background:#ffd700 }
+tr.st-hard td.cn::before { content:''; display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; vertical-align:middle; background:#ff5544 }
+tr.st-nc   td.cn::before { content:''; display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; vertical-align:middle; background:#5599ff }
+tr.st-ec   td.cn::before { content:''; display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; vertical-align:middle; background:#44cc66 }
+tr.st-fail td.cn::before { content:''; display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; vertical-align:middle; background:#334488 }
+
+/* ── DROPDOWN ── */
+#sdrop{
+  display:none;
+  position:fixed;
+  background:#14142a;
+  border:1px solid #303060;
+  border-radius:6px;
+  box-shadow:0 6px 24px rgba(0,0,0,.7);
+  z-index:900;
+  overflow:hidden;
+  min-width:150px;
+}
+#sdrop button{
+  display:block;width:100%;
+  padding:8px 14px;
+  background:none;border:none;
+  color:var(--txt);
+  font-size:12px;font-family:inherit;
+  text-align:left;cursor:pointer;
+  border-bottom:1px solid #1e1e3a;
+  transition:background .12s;
+  display:flex;align-items:center;gap:8px;
+}
+#sdrop button:last-child{border-bottom:none}
+#sdrop button:hover{background:#1e1e40}
+#sdrop button .dot{
+  display:inline-block;
+  width:8px;height:8px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+#sdrop .drop-title{
+  padding:6px 14px 4px;
+  font-size:10px;color:var(--dim);
+  letter-spacing:.06em;
+  border-bottom:1px solid #1e1e3a;
+}
 
 /* type badges */
 .bdg{
@@ -253,6 +326,8 @@ td.ct{white-space:nowrap}
   <div id="mn-list"></div>
 </nav>
 
+<div id="sdrop"></div>
+
 <main id="main"></main>
 
 <script>
@@ -272,6 +347,65 @@ function badge(t){
 function esc(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+/* ── clear status definitions ── */
+const STATS = [
+  {key:'',     label:'未クリア',   dot:'#444466'},
+  {key:'fc',   label:'FULLCOMBO', dot:'#c0c0d8'},
+  {key:'ex',   label:'EX-CLEAR',  dot:'#ffd700'},
+  {key:'hard', label:'HARD',      dot:'#ff5544'},
+  {key:'nc',   label:'N-CLEAR',   dot:'#5599ff'},
+  {key:'ec',   label:'E-CLEAR',   dot:'#44cc66'},
+  {key:'fail', label:'FAILED',    dot:'#334488'},
+];
+const LSPREFIX = 'iidx12_';
+let activeKey = null;
+
+/* ── localStorage helpers ── */
+function saveStatus(key, st){ localStorage.setItem(LSPREFIX+key, st); }
+function loadStatus(key){ return localStorage.getItem(LSPREFIX+key)||''; }
+
+/* ── apply status to a row ── */
+function applyStatus(row, st){
+  STATS.forEach(s => row.classList.remove('st-'+s.key));
+  if(st) row.classList.add('st-'+st);
+}
+
+/* ── build dropdown ── */
+const sdrop = document.getElementById('sdrop');
+sdrop.innerHTML = `<div class="drop-title">クリア状況</div>`
+  + STATS.map(s =>
+    `<button data-st="${s.key}">
+      <span class="dot" style="background:${s.dot}"></span>${s.label}
+    </button>`
+  ).join('');
+
+sdrop.querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const st = btn.dataset.st;
+    if(activeKey){
+      const row = document.querySelector(`tr[data-key="${activeKey}"]`);
+      if(row){ applyStatus(row, st); saveStatus(activeKey, st); }
+    }
+    closeDrop();
+  });
+});
+
+function openDrop(e, key){
+  e.stopPropagation();
+  activeKey = key;
+  sdrop.style.display = 'block';
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const dw = 160, dh = sdrop.offsetHeight || 210;
+  let x = e.clientX + 4, y = e.clientY + 4;
+  if(x + dw > vw - 8) x = vw - dw - 8;
+  if(y + dh > vh - 8) y = vh - dh - 8;
+  sdrop.style.left = x + 'px';
+  sdrop.style.top  = y + 'px';
+}
+function closeDrop(){ sdrop.style.display='none'; activeKey=null; }
+document.addEventListener('click', closeDrop);
 
 /* ── all tier data ── */
 /* format: [ver, name, bpm_str, notes, attr, type] */
@@ -882,16 +1016,17 @@ mnList.innerHTML = TIERS.map(t =>
 /* ── build main content ── */
 const mainEl = document.getElementById('main');
 mainEl.innerHTML = TIERS.map(t => {
-  const rows = t.songs.map(([ver,name,bpm,notes,attr,type]) =>
-    `<tr>
+  const rows = t.songs.map(([ver,name,bpm,notes,attr,type], i) => {
+    const key = `${t.id}-${i}`;
+    return `<tr data-key="${key}">
       <td class="cv">${ver}</td>
-      <td class="cn">${esc(name)}</td>
+      <td class="cn" onclick="openDrop(event,'${key}')">${esc(name)}</td>
       <td class="cb">${esc(bpm)}</td>
       <td class="co">${notes.toLocaleString()}</td>
       <td class="ca">${esc(attr)}</td>
       <td class="ct">${badge(type)}</td>
-    </tr>`
-  ).join('');
+    </tr>`;
+  }).join('');
 
   return `<section class="ts" id="${t.id}">
     <div class="th" style="--tc:${t.color}">
@@ -917,6 +1052,18 @@ mainEl.innerHTML = TIERS.map(t => {
     </table>
   </section>`;
 }).join('');
+
+/* ── restore saved statuses from localStorage ── */
+TIERS.forEach(t => {
+  t.songs.forEach((_, i) => {
+    const key = `${t.id}-${i}`;
+    const st = loadStatus(key);
+    if(st){
+      const row = document.querySelector(`tr[data-key="${key}"]`);
+      if(row) applyStatus(row, st);
+    }
+  });
+});
 
 /* ── hamburger / menu logic ── */
 const hbg = document.getElementById('hbg');
