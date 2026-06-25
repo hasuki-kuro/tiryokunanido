@@ -62,6 +62,10 @@ body{background:var(--bg);color:var(--txt);font-family:'Hiragino Kaku Gothic Pro
 .tbl thead th{background:var(--s1);color:var(--dim);font-weight:400;font-size:11px;padding:5px 6px;border-bottom:1px solid var(--bdr);white-space:nowrap;overflow:hidden}
 .tbl thead th.cv{text-align:center}
 .tbl thead th.co{text-align:right}
+.tbl thead th.sortable{cursor:pointer;user-select:none}
+.tbl thead th.sortable:hover{color:var(--txt);background:#141428}
+.tbl thead th.sort-asc::after {content:' ▲';font-size:9px;color:#7aaaff}
+.tbl thead th.sort-desc::after{content:' ▼';font-size:9px;color:#7aaaff}
 .tbl tbody tr{border-bottom:1px solid #101020}
 .tbl tbody tr:not([class*="st-"]):nth-child(even){background:rgba(255,255,255,.012)}
 .tbl tbody tr:not([class*="st-"]):hover{background:#141432}
@@ -829,8 +833,56 @@ const TIERS=[
   ]},
 ];
 
-/* sort by ver */
+/* sort by ver (initial) */
 TIERS.forEach(t=>t.songs.sort((a,b)=>a[0]-b[0]));
+
+/* sort system */
+let sortState={col:'ver',dir:1};
+
+function parseBpm(s){const m=String(s).match(/\((\d+)\)/);return m?parseInt(m[1]):(parseInt(String(s))||0)}
+
+function sortedSongs(songs){
+  const{col,dir}=sortState;
+  return[...songs].sort((a,b)=>{
+    let av,bv;
+    if(col==='ver')  {av=a[0];bv=b[0]}
+    else if(col==='name') {av=a[1];bv=b[1]}
+    else if(col==='bpm')  {av=parseBpm(a[2]);bv=parseBpm(b[2])}
+    else if(col==='notes'){av=a[3];bv=b[3]}
+    else if(col==='type') {av=a[a.length-1];bv=b[b.length-1]}
+    if(av<bv)return -dir;if(av>bv)return dir;return 0;
+  });
+}
+
+function makeRows(t){
+  return sortedSongs(t.songs).map(song=>{
+    const origIdx=t.songs.indexOf(song);
+    const[ver,name,bpm,notes]=song;
+    const type=song[song.length-1];
+    const key=`${t.id}-${origIdx}`;
+    return`<tr data-key="${key}" data-name="${esc(name)}"><td class="cv">${ver}</td><td class="cn" onclick="openDrop(event,'${key}')">${esc(name)}</td><td class="cb">${esc(bpm)}</td><td class="co">${notes.toLocaleString()}</td><td class="ct">${badge(type)}</td></tr>`;
+  }).join('');
+}
+
+function restoreStatus(t){
+  t.songs.forEach(([,name],i)=>{
+    const st=loadStatus(name);
+    if(st){const row=document.querySelector(`tr[data-key="${t.id}-${i}"]`);if(row)applyStatus(row,st)}
+  });
+}
+
+function updateSort(col){
+  if(sortState.col===col)sortState.dir*=-1;
+  else{sortState.col=col;sortState.dir=1}
+  document.querySelectorAll('.tbl thead th[data-col]').forEach(th=>{
+    th.classList.remove('sort-asc','sort-desc');
+    if(th.dataset.col===col)th.classList.add(sortState.dir===1?'sort-asc':'sort-desc');
+  });
+  TIERS.forEach(t=>{
+    const tbody=document.querySelector(`#${t.id} .tbl tbody`);
+    if(tbody){tbody.innerHTML=makeRows(t);restoreStatus(t)}
+  });
+}
 
 /* side menu */
 const mnList=document.getElementById('mn-list');
@@ -838,19 +890,13 @@ mnList.innerHTML=TIERS.map(t=>`<a class="mn-a" href="#${t.id}" onclick="closeMn(
 
 /* main content */
 const mainEl=document.getElementById('main');
-mainEl.innerHTML=TIERS.map(t=>{
-  const rows=t.songs.map(([ver,name,bpm,notes,type],i)=>{
-    const key=`${t.id}-${i}`;
-    return`<tr data-key="${key}" data-name="${esc(name)}"><td class="cv">${ver}</td><td class="cn" onclick="openDrop(event,'${key}')">${esc(name)}</td><td class="cb">${esc(bpm)}</td><td class="co">${notes.toLocaleString()}</td><td class="ct">${badge(type)}</td></tr>`;
-  }).join('');
-  return`<section class="ts" id="${t.id}"><div class="th" style="--tc:${t.color}"><h2>${t.name}</h2><span class="th-n">${t.songs.length}曲</span></div><table class="tbl"><colgroup><col class="cv"><col class="cn"><col class="cb"><col class="co"><col class="ct"></colgroup><thead><tr><th class="cv">ver</th><th class="cn">曲名</th><th class="cb">BPM(開幕)</th><th class="co">notes</th><th class="ct">タイプ</th></tr></thead><tbody>${rows}</tbody></table></section>`;
-}).join('');
+mainEl.innerHTML=TIERS.map(t=>`<section class="ts" id="${t.id}"><div class="th" style="--tc:${t.color}"><h2>${t.name}</h2><span class="th-n">${t.songs.length}曲</span></div><table class="tbl"><colgroup><col class="cv"><col class="cn"><col class="cb"><col class="co"><col class="ct"></colgroup><thead><tr><th class="cv sortable sort-asc" data-col="ver">ver</th><th class="cn sortable" data-col="name">曲名</th><th class="cb sortable" data-col="bpm">BPM(開幕)</th><th class="co sortable" data-col="notes">notes</th><th class="ct sortable" data-col="type">タイプ</th></tr></thead><tbody>${makeRows(t)}</tbody></table></section>`).join('');
+
+/* click header to sort */
+mainEl.addEventListener('click',e=>{const th=e.target.closest('th[data-col]');if(th)updateSort(th.dataset.col)});
 
 /* restore localStorage */
-TIERS.forEach(t=>t.songs.forEach(([,name],i)=>{
-  const st=loadStatus(name);
-  if(st){const row=document.querySelector(`tr[data-key="${t.id}-${i}"]`);if(row)applyStatus(row,st)}
-}));
+TIERS.forEach(t=>restoreStatus(t));
 
 /* hamburger */
 const hbg=document.getElementById('hbg'),mn=document.getElementById('mn'),ov=document.getElementById('ov'),mc=document.getElementById('mc');
