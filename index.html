@@ -300,11 +300,38 @@ tr.st-fail td.cn::before { content:''; display:inline-block; width:7px; height:7
 }
 
 /* mobile */
+/* switch button */
+.sw-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;
+  border:1px solid #303060;border-radius:4px;
+  color:#7aaaff;text-decoration:none;
+  font-size:11px;letter-spacing:.04em;white-space:nowrap;
+  flex-shrink:0;
+  transition:background .15s,border-color .15s;
+}
+.sw-btn:hover{background:#1a1a38;border-color:#5050a0}
+
+/* export / import buttons */
+.io-btn{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:4px 8px;
+  background:none;
+  border:1px solid #303060;border-radius:4px;
+  color:#9ab8d0;
+  font-size:11px;letter-spacing:.04em;white-space:nowrap;
+  cursor:pointer;flex-shrink:0;
+  transition:background .15s,border-color .15s;
+}
+.io-btn:hover{background:#1a1a38;border-color:#5050a0;color:#7aaaff}
+
 @media(max-width:580px){
   .ca{display:none}
   .tbl colgroup .cb{width:90px}
   .tbl colgroup .co{width:44px}
   #hd h1{font-size:13px}
+  .sw-btn span,.io-btn span{display:none}
+  .io-btn{padding:4px 7px}
 }
 </style>
 </head>
@@ -312,6 +339,10 @@ tr.st-fail td.cn::before { content:''; display:inline-block; width:7px; height:7
 
 <div id="hd">
   <h1><span class="star">☆12</span> ノーマル難易度表</h1>
+  <a href="hard.html" class="sw-btn">ハード表<span> →</span></a>
+  <button class="io-btn" id="exp-btn" title="記録をJSONファイルで書き出す">↓<span> 書出</span></button>
+  <button class="io-btn" id="imp-btn" title="JSONファイルから記録を読み込む">↑<span> 読込</span></button>
+  <input type="file" id="imp-file" accept=".json" style="display:none">
   <button id="hbg" aria-label="メニューを開く">
     <span></span><span></span><span></span>
   </button>
@@ -359,12 +390,13 @@ const STATS = [
   {key:'ec',   label:'E-CLEAR',   dot:'#44cc66'},
   {key:'fail', label:'FAILED',    dot:'#334488'},
 ];
-const LSPREFIX = 'iidx12_';
+const LS = 'iidx12_song_';
 let activeKey = null;
 
-/* ── localStorage helpers ── */
-function saveStatus(key, st){ localStorage.setItem(LSPREFIX+key, st); }
-function loadStatus(key){ return localStorage.getItem(LSPREFIX+key)||''; }
+/* ── localStorage helpers (song-name based, shared with hard table) ── */
+function lsKey(name){ return LS + name; }
+function saveStatus(name, st){ localStorage.setItem(lsKey(name), st); }
+function loadStatus(name){ return localStorage.getItem(lsKey(name))||''; }
 
 /* ── apply status to a row ── */
 function applyStatus(row, st){
@@ -387,7 +419,7 @@ sdrop.querySelectorAll('button').forEach(btn => {
     const st = btn.dataset.st;
     if(activeKey){
       const row = document.querySelector(`tr[data-key="${activeKey}"]`);
-      if(row){ applyStatus(row, st); saveStatus(activeKey, st); }
+      if(row){ applyStatus(row, st); saveStatus(row.dataset.name, st); }
     }
     closeDrop();
   });
@@ -1019,7 +1051,7 @@ const mainEl = document.getElementById('main');
 mainEl.innerHTML = TIERS.map(t => {
   const rows = t.songs.map(([ver,name,bpm,notes,attr,type], i) => {
     const key = `${t.id}-${i}`;
-    return `<tr data-key="${key}">
+    return `<tr data-key="${key}" data-name="${esc(name)}">
       <td class="cv">${ver}</td>
       <td class="cn" onclick="openDrop(event,'${key}')">${esc(name)}</td>
       <td class="cb">${esc(bpm)}</td>
@@ -1056,11 +1088,10 @@ mainEl.innerHTML = TIERS.map(t => {
 
 /* ── restore saved statuses from localStorage ── */
 TIERS.forEach(t => {
-  t.songs.forEach((_, i) => {
-    const key = `${t.id}-${i}`;
-    const st = loadStatus(key);
+  t.songs.forEach(([,name], i) => {
+    const st = loadStatus(name);
     if(st){
-      const row = document.querySelector(`tr[data-key="${key}"]`);
+      const row = document.querySelector(`tr[data-key="${t.id}-${i}"]`);
       if(row) applyStatus(row, st);
     }
   });
@@ -1087,6 +1118,43 @@ function closeMn(){
 hbg.addEventListener('click', openMn);
 ov.addEventListener('click',  closeMn);
 mc.addEventListener('click',  closeMn);
+
+/* ── export / import ── */
+document.getElementById('exp-btn').addEventListener('click', () => {
+  const data = {};
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(k.startsWith('iidx12_song_')) data[k] = localStorage.getItem(k);
+  }
+  const count = Object.keys(data).length;
+  if(count === 0){ alert('保存された記録がありません'); return; }
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'iidx_records.json'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+const impFile = document.getElementById('imp-file');
+document.getElementById('imp-btn').addEventListener('click', () => impFile.click());
+impFile.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      let count = 0;
+      for(const [k, v] of Object.entries(data)){
+        if(k.startsWith('iidx12_song_')){ localStorage.setItem(k, v); count++; }
+      }
+      alert(`${count}件の記録を読み込みました。ページを再読み込みします。`);
+      location.reload();
+    } catch(err){ alert('ファイルの読み込みに失敗しました。'); }
+  };
+  reader.readAsText(file);
+  impFile.value = '';
+});
 </script>
 </body>
 </html>
