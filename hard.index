@@ -1,1 +1,899 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>☆12 ハード難易度表</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08080e;--s1:#0e0e1c;--s2:#121224;--bdr:#20203a;
+  --txt:#d2d2ea;--dim:#8890b0;--hh:50px;--mw:264px;
+  --mono:'Courier New',Consolas,monospace;
+}
+body{background:var(--bg);color:var(--txt);font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',system-ui,sans-serif;font-size:13px;line-height:1.4;min-height:100vh}
 
+/* HEADER */
+#hd{position:fixed;top:0;left:0;right:0;height:var(--hh);background:#0a0a16;border-bottom:1px solid #222242;display:flex;align-items:center;padding:0 14px;z-index:200}
+#hd h1{flex:1;font-size:15px;font-weight:700;color:#7aaaff;letter-spacing:.06em}
+#hd h1 .star{color:#ffd700;margin-right:2px}
+
+/* HAMBURGER */
+#hbg{width:36px;height:36px;background:none;border:1px solid #282850;border-radius:3px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;padding:7px;flex-shrink:0;transition:border-color .2s}
+#hbg:hover{border-color:#4040a0}
+#hbg span{display:block;width:18px;height:2px;background:#7aaaff;border-radius:1px;transition:transform .22s,opacity .22s}
+#hbg.is-open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+#hbg.is-open span:nth-child(2){opacity:0}
+#hbg.is-open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* OVERLAY */
+#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300}
+#ov.on{display:block}
+
+/* SIDE MENU */
+#mn{position:fixed;top:0;right:calc(-1 * var(--mw));width:var(--mw);height:100vh;background:#0c0c1c;border-left:1px solid #222242;z-index:400;transition:right .26s ease;display:flex;flex-direction:column}
+#mn.open{right:0}
+#mn-top{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #1a1a32;flex-shrink:0}
+#mn-top span{font-size:11px;color:var(--dim);letter-spacing:.08em}
+#mc{background:none;border:none;color:#7aaaff;font-size:18px;cursor:pointer;line-height:1;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+#mn-list{overflow-y:auto;flex:1;padding-bottom:24px}
+.mn-a{display:flex;align-items:center;gap:8px;padding:9px 16px;color:var(--dim);text-decoration:none;border-bottom:1px solid #14142a;font-size:12px;transition:background .14s,color .14s}
+.mn-a:hover{background:#141430;color:var(--txt)}
+.mn-grade{font-weight:700;min-width:68px}
+.mn-n{font-size:11px;color:var(--dim)}
+
+/* MAIN */
+#main{padding-top:calc(var(--hh) + 10px);padding-bottom:60px}
+
+/* TIER */
+.ts{margin-bottom:24px}
+.th{position:sticky;top:var(--hh);background:#0d0d1c;border-left:4px solid var(--tc,#666);padding:6px 14px;display:flex;align-items:center;gap:10px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.th h2{font-size:13px;font-weight:700;color:var(--tc,#888);letter-spacing:.04em}
+.th-n{font-size:11px;color:var(--dim)}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;table-layout:fixed}
+.tbl colgroup .cv{width:34px}
+.tbl colgroup .cn{width:auto}
+.tbl colgroup .cb{width:118px}
+.tbl colgroup .co{width:52px}
+.tbl colgroup .ct{width:78px}
+
+.tbl thead th{background:var(--s1);color:var(--dim);font-weight:400;font-size:11px;padding:5px 6px;border-bottom:1px solid var(--bdr);white-space:nowrap;overflow:hidden}
+.tbl thead th.cv{text-align:center}
+.tbl thead th.co{text-align:right}
+.tbl tbody tr{border-bottom:1px solid #101020}
+.tbl tbody tr:not([class*="st-"]):nth-child(even){background:rgba(255,255,255,.012)}
+.tbl tbody tr:not([class*="st-"]):hover{background:#141432}
+.tbl tbody tr[class*="st-"]:hover{filter:brightness(1.15)}
+.tbl td{padding:5px 6px;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+td.cv{text-align:center;font-family:var(--mono);font-size:12px;color:#9898b8}
+td.cn{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;user-select:none}
+td.cn:hover{text-decoration:underline;text-decoration-color:rgba(255,255,255,.3)}
+td.cb{font-family:var(--mono);font-size:12px;color:#aac8e0;white-space:nowrap}
+td.co{font-family:var(--mono);font-size:12px;color:#aac8e0;text-align:right}
+td.ct{white-space:nowrap}
+
+/* STATUS */
+tr.st-fc   {background:#2a2a40}
+tr.st-ex   {background:#2e2600}
+tr.st-hard {background:#300a06}
+tr.st-nc   {background:#061428}
+tr.st-ec   {background:#061a08}
+tr.st-fail {background:#04051a}
+tr.st-fc   td.cn{color:#d4d4ea;font-weight:600}
+tr.st-ex   td.cn{color:#ffd700;font-weight:600}
+tr.st-hard td.cn{color:#ff6655;font-weight:600}
+tr.st-nc   td.cn{color:#5599ff;font-weight:600}
+tr.st-ec   td.cn{color:#44cc66;font-weight:600}
+tr.st-fail td.cn{color:#4466bb;font-weight:600}
+tr.st-fc   td.cn::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle;background:#c0c0d8}
+tr.st-ex   td.cn::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle;background:#ffd700}
+tr.st-hard td.cn::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle;background:#ff5544}
+tr.st-nc   td.cn::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle;background:#5599ff}
+tr.st-ec   td.cn::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle;background:#44cc66}
+tr.st-fail td.cn::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle;background:#334488}
+
+/* DROPDOWN */
+#sdrop{display:none;position:fixed;background:#14142a;border:1px solid #303060;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.7);z-index:900;overflow:hidden;min-width:150px}
+#sdrop button{display:flex;width:100%;padding:8px 14px;background:none;border:none;color:var(--txt);font-size:12px;font-family:inherit;text-align:left;cursor:pointer;border-bottom:1px solid #1e1e3a;transition:background .12s;align-items:center;gap:8px}
+#sdrop button:last-child{border-bottom:none}
+#sdrop button:hover{background:#1e1e40}
+#sdrop button .dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0}
+#sdrop .drop-title{padding:6px 14px 4px;font-size:10px;color:var(--dim);letter-spacing:.06em;border-bottom:1px solid #1e1e3a}
+
+/* badge */
+.bdg{display:inline-block;padding:1px 5px;border-radius:2px;font-size:10px;font-weight:700;white-space:nowrap;border:1px solid transparent;letter-spacing:.02em}
+
+/* switch button */
+.sw-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;
+  border:1px solid #303060;border-radius:4px;
+  color:#7aaaff;text-decoration:none;
+  font-size:11px;letter-spacing:.04em;white-space:nowrap;
+  flex-shrink:0;
+  transition:background .15s,border-color .15s;
+}
+.sw-btn:hover{background:#1a1a38;border-color:#5050a0}
+
+/* export / import buttons */
+.io-btn{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:4px 8px;
+  background:none;
+  border:1px solid #303060;border-radius:4px;
+  color:#9ab8d0;
+  font-size:11px;letter-spacing:.04em;white-space:nowrap;
+  cursor:pointer;flex-shrink:0;
+  transition:background .15s,border-color .15s;
+}
+.io-btn:hover{background:#1a1a38;border-color:#5050a0;color:#7aaaff}
+
+@media(max-width:580px){
+  .tbl colgroup .cb{width:90px}
+  .tbl colgroup .co{width:44px}
+  #hd h1{font-size:13px}
+  .sw-btn span,.io-btn span{display:none}
+  .io-btn{padding:4px 7px}
+}
+</style>
+</head>
+<body>
+
+<div id="hd">
+  <h1><span class="star">☆12</span> ハード難易度表</h1>
+  <a href="index.html" class="sw-btn">ノーマル表<span> →</span></a>
+  <button class="io-btn" id="exp-btn" title="記録をJSONファイルで書き出す">↓<span> 書出</span></button>
+  <button class="io-btn" id="imp-btn" title="JSONファイルから記録を読み込む">↑<span> 読込</span></button>
+  <input type="file" id="imp-file" accept=".json" style="display:none">
+  <button id="hbg" aria-label="メニューを開く">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<div id="ov"></div>
+
+<nav id="mn" aria-label="ティアナビゲーション">
+  <div id="mn-top">
+    <span>TIER LIST</span>
+    <button id="mc" aria-label="メニューを閉じる">✕</button>
+  </div>
+  <div id="mn-list"></div>
+</nav>
+
+<div id="sdrop"></div>
+<main id="main"></main>
+
+<script>
+const BC={
+  'PEAK':    ['#3a2800','#ffaa00','#5a4200'],
+  'CHARGE':  ['#003a28','#00ffaa','#005a3a'],
+  'NOTES':   ['#002a44','#00aaff','#003a64'],
+  'SOF-LAN': ['#28003a','#cc88ff','#3a0050'],
+  'CHORD':   ['#380038','#ff88ff','#500050'],
+  'SCRATCH': ['#380000','#ff8888','#500000'],
+};
+function badge(t){const[bg,fg,bd]=BC[t]||['#222','#aaa','#333'];return`<span class="bdg" style="background:${bg};color:${fg};border-color:${bd}">${t}</span>`}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+const STATS=[
+  {key:'',    label:'未クリア',   dot:'#444466'},
+  {key:'fc',  label:'FULLCOMBO', dot:'#c0c0d8'},
+  {key:'ex',  label:'EX-CLEAR',  dot:'#ffd700'},
+  {key:'hard',label:'HARD',      dot:'#ff5544'},
+  {key:'nc',  label:'N-CLEAR',   dot:'#5599ff'},
+  {key:'ec',  label:'E-CLEAR',   dot:'#44cc66'},
+  {key:'fail',label:'FAILED',    dot:'#334488'},
+];
+const LS='iidx12_song_';
+let activeKey=null;
+function lsKey(name){return LS+name}
+function saveStatus(name,st){localStorage.setItem(lsKey(name),st)}
+function loadStatus(name){return localStorage.getItem(lsKey(name))||''}
+function applyStatus(row,st){STATS.forEach(s=>row.classList.remove('st-'+s.key));if(st)row.classList.add('st-'+st)}
+
+const sdrop=document.getElementById('sdrop');
+sdrop.innerHTML=`<div class="drop-title">クリア状況</div>`+STATS.map(s=>`<button data-st="${s.key}"><span class="dot" style="background:${s.dot}"></span>${s.label}</button>`).join('');
+sdrop.querySelectorAll('button').forEach(btn=>{
+  btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    const st=btn.dataset.st;
+    if(activeKey){const row=document.querySelector(`tr[data-key="${activeKey}"]`);if(row){applyStatus(row,st);saveStatus(row.dataset.name,st)}}
+    closeDrop();
+  });
+});
+function openDrop(e,key){
+  e.stopPropagation();activeKey=key;sdrop.style.display='block';
+  const vw=window.innerWidth,vh=window.innerHeight,dw=160,dh=sdrop.offsetHeight||210;
+  let x=e.clientX+4,y=e.clientY+4;
+  if(x+dw>vw-8)x=vw-dw-8;if(y+dh>vh-8)y=vh-dh-8;
+  sdrop.style.left=x+'px';sdrop.style.top=y+'px';
+}
+function closeDrop(){sdrop.style.display='none';activeKey=null}
+document.addEventListener('click',closeDrop);
+
+/* ── tier data [ver, name, bpm, notes, type] ── */
+const TIERS=[
+  {id:'jsp',name:'地力S+',  color:'#ffee44',songs:[
+    [30,'Beyond Evolution','185',2216,'PEAK'],
+    [22,'Chrono Diver -PENDULUMs-','196',2222,'NOTES'],
+    [25,'DEATH\u2020ZIGOQ \uff5e怒りの高速爆走野郎\uff5e(L)','200',2459,'NOTES'],
+    [27,'EROICA','200',2040,'PEAK'],
+    [21,'Feel The Beat(L)','175',2225,'PEAK'],
+    [24,'Go Ahead!!','200',1413,'PEAK'],
+    [16,'Go Beyond!!','200',1166,'PEAK'],
+    [24,'GuNGNiR(L)','222',2443,'NOTES'],
+    [15,'ICARUS(L)','126-251(176)',2000,'SOF-LAN'],
+    [20,'Illegal Function Call(L)','260',2023,'PEAK'],
+    [21,'KAISER PHOENIX(L)','170',2026,'NOTES'],
+    [14,'KAMAITACHI(L)','165',2000,'PEAK'],
+    [24,'Mare Nectaris','256',2094,'PEAK'],
+    [29,'n/a','85-255(170)',1867,'SOF-LAN'],
+    [21,'Sigmund(L)','200',2267,'NOTES'],
+    [28,'Sinus Iridum','128-256(128)',1803,'CHARGE'],
+    [30,'Somnidiscotheque','115',1776,'CHARGE'],
+    [19,'The Limbo(L)','200',2190,'PEAK'],
+    [21,'Verflucht(L)','180',2401,'NOTES'],
+    [16,'3y3s','191',1871,'PEAK'],
+    [26,'X-DEN','200',2220,'PEAK'],
+    [21,'疾風迅雷(L)','180',1824,'PEAK'],
+    [28,'ディスコルディア','180-280(280)',2073,'CHARGE'],
+    [16,'卑弥呼','82-185(185)',2119,'PEAK'],
+    [12,'冥','66-200(200)',2000,'SOF-LAN'],
+    [31,'惑星鉄道','10-166(157)',1633,'SOF-LAN'],
+  ]},
+  {id:'ksp',name:'個人差S+',color:'#ddcc00',songs:[
+    [19,'DIAVOLO','160',1745,'PEAK'],
+    [31,'Level 5','185',1937,'SCRATCH'],
+    [20,'Plan 8','212',1690,'SCRATCH'],
+    [29,'RAGE feat.H14 of LEONAIR','166',1886,'SCRATCH'],
+    [24,'SAMURAI-Scramble(L)','150',1576,'SCRATCH'],
+    [20,'Thor\'s Hammer','150',1641,'PEAK'],
+    [20,'Timepiece phase II (CN Ver.)','287',1546,'CHARGE'],
+    [23,'灼熱 Pt.2 Long Train Running','165',1804,'SCRATCH'],
+    [18,'灼熱Beach Side Bunny','153',1719,'SCRATCH'],
+  ]},
+  {id:'js', name:'地力S',   color:'#ffd700',songs:[
+    [17,'Almagest','178',1629,'CHARGE'],
+    [31,'Ambivalent Vermilia','185',2132,'NOTES'],
+    [30,'Bad Encryption','200',1633,'PEAK'],
+    [29,'Binary Black Hole','190',2000,'PEAK'],
+    [24,'BroGamer(L)','207',2383,'CHORD'],
+    [26,'Carmina','195',2000,'CHARGE'],
+    [20,'Confiserie','185',1833,'PEAK'],
+    [18,'Dances with Snow Fairies(L)','154',2135,'PEAK'],
+    [27,'Dans la nuit de l\'eternite','244',1830,'PEAK'],
+    [22,'EBONY & IVORY(L)','113-170(170)',1887,'NOTES'],
+    [20,'Elemental Creation','212',2130,'CHORD'],
+    [25,'EMERALDAS','88-176(176)',1833,'PEAK'],
+    [27,'Everlasting Message','230',1970,'CHARGE'],
+    [26,'GO OVER WITH GLARE -ROOTAGE 26-','170',2000,'CHORD'],
+    [29,'hard-wired','208',1901,'PEAK'],
+    [28,'Ignis\u2020Irae','188-191(191)',1970,'CHARGE'],
+    [27,'Lost Souls(L)','185',2000,'NOTES'],
+    [28,'MEGAERA','206',1790,'PEAK'],
+    [27,'Override(L)','175',2204,'CHORD'],
+    [18,'perditus\u2020paradisus','172',2065,'NOTES'],
+    [19,'Phoenix(L)','176',2027,'NOTES'],
+    [20,'Saturn(L)','155',1783,'PEAK'],
+    [21,'Sigmund','200',2029,'NOTES'],
+    [15,'STEEL NEEDLE(L)','205',1701,'PEAK'],
+    [14,'TRANOID(L)','130-190(130)',1546,'NOTES'],
+    [14,'VANESSA(L)','185',1771,'NOTES'],
+    [30,'Xerulean','182',1802,'PEAK'],
+    [30,'栄冠のカンパネラ','185',2000,'CHARGE'],
+    [23,'駅猫のワルツ','282',1558,'NOTES'],
+    [24,'焔極OVERKILL','192',1901,'NOTES'],
+    [20,'お米の美味しい炊き方、そしてお米を食べることによるその効果。(L)','190',1907,'NOTES'],
+    [20,'カジノファイヤーことみちゃん(L)','230',1777,'NOTES'],
+    [22,'共鳴遊戯の華','190',2000,'CHARGE'],
+    [21,'IX','198',2007,'NOTES'],
+    [13,'嘆きの樹','160',2000,'PEAK'],
+    [22,'表裏一体！？怪盗いいんちょの悩み(L)','165',2334,'CHORD'],
+    [21,'煉獄のエルフェリア','183',2000,'PEAK'],
+  ]},
+  {id:'ks', name:'個人差S', color:'#e0b800',songs:[
+    [19,'BLACK.by X-Cross Fade','163',1738,'SCRATCH'],
+    [24,'ECHIDNA','146',1775,'CHARGE'],
+    [14,'Fascination MAXX','100-400(100)',1313,'SOF-LAN'],
+    [28,'Level 3','175',1844,'SCRATCH'],
+    [30,'Level 4','180',1883,'SCRATCH'],
+    [26,'Level One','173',1857,'SCRATCH'],
+    [27,'Lords Of The Roundtable','174',1586,'SCRATCH'],
+    [21,'Miracle 5ympho X(L)','210',1551,'SCRATCH'],
+    [23,'NZM','190',1783,'CHARGE'],
+    [26,'Red. by Jack Trance','160',1862,'SCRATCH'],
+    [25,'REVOLVER(L)','160',1731,'CHARGE'],
+    [31,'SOLAR ECLIPSE','195',1893,'NOTES'],
+    [25,'The Chase','142',1148,'SCRATCH'],
+    [28,'THE PEERLESS UNDER HEAVEN','170',1818,'PEAK'],
+    [15,'Time to Air(L)','191',1888,'CHORD'],
+    [19,'TITANS RETURN(L)','97-194(194)',1377,'CHARGE'],
+    [30,'V\u00d8ID','80-170(164)',1712,'SOF-LAN'],
+    [29,'WHA','108',1946,'SCRATCH'],
+    [16,'Y&Co. is dead or alive','145-876(145)',1478,'SOF-LAN'],
+    [29,'ピアノ独奏無言歌 "灰燼"','100-200(150)',1977,'SOF-LAN'],
+  ]},
+  {id:'ja', name:'地力A+',  color:'#c080ff',songs:[
+    [21,'Ancient Scapes(L)','178',2198,'NOTES'],
+    [15,'Anisakis -somatic mutation type"Forza"-(L)','185',1971,'CHORD'],
+    [16,'B4U(BEMANI FOR YOU MIX)(L)','170',2360,'CHORD'],
+    [23,'Blue Spring Express','172',1728,'PEAK'],
+    [31,'CADENZA','160',2357,'NOTES'],
+    [22,'CHRONO DIVER -NORNIR-(L)','185',2233,'CHORD'],
+    [13,'CONTRACT(L)','180',1418,'PEAK'],
+    [25,'DEATH\u2020ZIGOQ \uff5e怒りの高速爆走野郎\uff5e','200',2075,'NOTES'],
+    [21,'Elektrick U-Phoria(L)','180',2050,'NOTES'],
+    [15,'four pieces of heaven(L)','125-195(195)',1518,'PEAK'],
+    [13,'Ganymede(L)','72-82(82)',1356,'PEAK'],
+    [24,'GuNGNiR','222',2081,'NOTES'],
+    [25,'Initiation','160',2018,'CHORD'],
+    [21,'invoker(L)','195',1851,'NOTES'],
+    [21,'KAISER PHOENIX','170',1693,'NOTES'],
+    [27,'LIGHTNING STRIKES(L)','174',2123,'NOTES'],
+    [28,'LOCUS OF THE TRAVEL','182',1920,'CHARGE'],
+    [30,'LOUDER ROLLING THUNDER','180',1767,'NOTES'],
+    [32,'NOIXIA','165',2027,'CHARGE'],
+    [18,'PARADISE LOST','200',1718,'CHARGE'],
+    [24,'Quakes','190',1654,'PEAK'],
+    [32,'Satellite Burst','177',2000,'NOTES'],
+    [16,'Secrets(L)','150',2116,'CHORD'],
+    [27,'Smashing Wedge','215',1957,'NOTES'],
+    [29,'SOLID WYVERN(L)','165',1999,'NOTES'],
+    [30,'TECHNOPHOBIA','152',1544,'PEAK'],
+    [30,'The Clown of 24stairs','204',1788,'NOTES'],
+    [27,'THE F\u2200UST','170',1851,'PEAK'],
+    [26,'Unbelief','135',1675,'CHARGE'],
+    [21,'Verflucht','180',1805,'NOTES'],
+    [23,'Violet Pulse(L)','134',2115,'NOTES'],
+    [26,'voltississimo','225',1888,'NOTES'],
+    [31,'Vulnerability','167',1885,'NOTES'],
+    [20,'Zirkfied','210',1968,'PEAK'],
+    [30,'\uff3b \uff3dDENTITY','200',2000,'NOTES'],
+    [26,'お菓子の王国','190',2109,'PEAK'],
+    [27,'がっつり陰キャ!? 怪盗いいんちょの億劫^^;','185',2192,'NOTES'],
+    [19,'君のハートにロックオン(L)','260',1828,'NOTES'],
+    [19,'恋する☆宇宙戦争っ！！(L)','200',2355,'NOTES'],
+    [26,'金野火織の金色提言','225',1630,'PEAK'],
+    [25,'シムルグの目醒め','190',1822,'PEAK'],
+    [22,'千年ノ理(L)','153',2183,'CHORD'],
+    [28,'\u2200','180',1802,'PEAK'],
+    [22,'超青少年ノ為ノ超多幸ナ超古典的超舞曲(L)','150',2110,'NOTES'],
+    [19,'天空の夜明け','150',2072,'NOTES'],
+    [25,'東京神話','196',1505,'PEAK'],
+    [28,'二人ノ廃城幽踊宴','280-316(290)',1927,'NOTES'],
+    [28,'-65\u2103','186',1912,'NOTES'],
+  ]},
+  {id:'ka', name:'個人差A+',color:'#a060df',songs:[
+    [11,'Be quiet(L)','150',1463,'SCRATCH'],
+    [26,'CODE:0(L)','125',1829,'PEAK'],
+    [31,'Cult Invitation','164',1804,'SCRATCH'],
+    [23,'DIAMOND CROSSING','180',1585,'CHARGE'],
+    [29,'Don\'t believe the hype','210',1666,'SCRATCH'],
+    [23,'Dynamite','100',1953,'CHORD'],
+    [29,'GiGaGaHell','250',1687,'PEAK'],
+    [31,'Glitch N Ride','30-300(150)',1389,'SOF-LAN'],
+    [29,'Purple Perplex','150',1578,'SCRATCH'],
+    [22,'Rave*it!! Rave*it!!','282',1656,'CHORD'],
+    [22,'Reflux','150',1574,'CHARGE'],
+    [27,'SCREW // owo // SCREW','114',1567,'SCRATCH'],
+    [19,'Snake Stick','145',1447,'SCRATCH'],
+    [29,'TOMAHAWK','215',1830,'SCRATCH'],
+    [21,'VOX UP','202',1870,'CHORD'],
+    [25,'255','255',1676,'NOTES'],
+    [23,'紫陽花 -AZISAI-(L)','155',1815,'NOTES'],
+    [20,'音楽','210-360(245)',1487,'SOF-LAN'],
+    [23,'真 地獄超特急 -HELL or HELL-','165',1727,'CHARGE'],
+    [28,'バッド・スイーツ、バッド・ドリーム','220',1862,'SCRATCH'],
+    [30,'恋愛＝精度×認識力','3-333(177)',1756,'SOF-LAN'],
+  ]},
+  {id:'jaa',name:'地力A',   color:'#5599ff',songs:[
+    [29,'ABSOLUTE EVIL','200',1778,'CHARGE'],
+    [29,'ALTERNATOR','185',1907,'CHORD'],
+    [25,'ANCHOR','180',1835,'PEAK'],
+    [27,'Artist','165',1870,'NOTES'],
+    [17,'Bad Maniacs','195',1656,'PEAK'],
+    [27,'BEAT PRISONER','155',1844,'CHARGE'],
+    [28,'BLACK or WHITE?','185',2013,'NOTES'],
+    [15,'Blue Rain(L)','144',1702,'PEAK'],
+    [25,'Boomy and The Boost','174',1826,'CHORD'],
+    [21,'Close the World feat.a\u2606ru(L)','188',1983,'NOTES'],
+    [28,'COSMIC RAY','195',1509,'NOTES'],
+    [31,'Demon March','174',1875,'NOTES'],
+    [22,'Despair of ELFERIA','205',2096,'CHORD'],
+    [23,'Devil\'s Gear','180',1793,'PEAK'],
+    [24,'DORNWALD \uff5eJunge\uff5e','169',1903,'PEAK'],
+    [28,'Empire of Fury','204',1700,'NOTES'],
+    [22,'fallen leaves -IIDX edition-','165',1745,'NOTES'],
+    [22,'Flashes','180',1691,'NOTES'],
+    [19,'HAERETICUS','208',1589,'PEAK'],
+    [20,'Hollywood Galaxy','186',1392,'CHARGE'],
+    [30,'kors k\'s How to make OTOGE CORE \u300cLONG\u300d','190',1863,'NOTES'],
+    [25,'Life Is A Game ft.DD"ナカタ"Metal','195',1775,'PEAK'],
+    [26,'Macho Monky','150',1588,'PEAK'],
+    [15,'MENDES','168',1831,'PEAK'],
+    [15,'NEW GENERATION -もう、お前しか見えない-(L)','165',1895,'PEAK'],
+    [25,'O/D*20(L)','155',1984,'NOTES'],
+    [26,'Painful Fate','192',1702,'CHARGE'],
+    [17,'quell\uff5ethe seventh slave\uff5e','162',1646,'NOTES'],
+    [31,'Resonant','182',1864,'NOTES'],
+    [18,'reunion','184',1677,'CHORD'],
+    [12,'Scripted Connection\u21d2 A mix(L)','151',1749,'PEAK'],
+    [17,'SOLID STATE SQUAD(L)','155',1868,'CHORD'],
+    [20,'STULTI','90-182(182)',1416,'PEAK'],
+    [30,'suspicions','153',1908,'NOTES'],
+    [27,'THE BRAVE MUST DIE','215',2075,'CHORD'],
+    [26,'The Rebellion of Sequencer','300',1634,'NOTES'],
+    [28,'Tiempo Loco','180',1884,'NOTES'],
+    [23,'Triple Counter','216',2016,'CHORD'],
+    [27,'TRIUMPH','183',1724,'CHARGE'],
+    [30,'VOLAQUAS','212',1982,'NOTES'],
+    [13,'waxing and wanding(L)','191',2000,'CHORD'],
+    [26,'Xlo','165',1988,'NOTES'],
+    [23,'ZEPHYRANTHES(L)','180',1982,'NOTES'],
+    [29,'2 Beasts Unchained','175',1780,'NOTES'],
+    [27,'俺ら東京さ行ぐだ(L)','110-150(150)',1874,'NOTES'],
+    [27,'華麗なる大犬円舞曲','60-147(142)',1849,'NOTES'],
+    [20,'キャトられ恋はモ～モク','196',1988,'NOTES'],
+    [28,'閠槞彁の願い','180',1613,'PEAK'],
+    [31,'今宵、ロマンス横丁。','168',1714,'NOTES'],
+    [28,'世界の果てに約束の凱歌を -ReUnion-','200',1983,'CHORD'],
+    [24,'津軽雪','160',1953,'PEAK'],
+    [28,'伐折羅-vajra-','173',1877,'NOTES'],
+    [27,'ピアノ協奏曲第1番"蠍火" (BlackY Remix)','160',1926,'PEAK'],
+  ]},
+  {id:'kaa',name:'個人差A', color:'#3377dd',songs:[
+    [21,'ALBA-黎明-(L)','165',1990,'CHORD'],
+    [25,'Antigravity','222',1591,'NOTES'],
+    [22,'BLUE MIRAGE','170',1606,'SCRATCH'],
+    [20,'DAY DREAM','80-300(80)',1075,'SOF-LAN'],
+    [27,'Inferno of Fomalhaut','150',1701,'PEAK'],
+    [20,'JOMANDA','90-300(195)',1918,'SOF-LAN'],
+    [15,'PARANOiA \uff5eHADES\uff5e','75-300(300)',1395,'SOF-LAN'],
+    [30,'Peaktime Booster','180',1663,'SCRATCH'],
+    [12,'rage against usual','152',1527,'PEAK'],
+    [17,'Red. by Full Metal Jacket','158',1643,'SCRATCH'],
+    [24,'Snakey Kung-fu','156',1751,'CHARGE'],
+    [18,'Watch Out Pt.2','148',1506,'SCRATCH'],
+    [23,'199024club -Re:BounceKiller-','143',1260,'SCRATCH'],
+    [31,'灼熱Beach Side Bunny (かめりあ\'s "Summertime D\'n\'B" Remix)','174',1647,'SCRATCH'],
+    [28,'水鏡の異界','168',1661,'CHARGE'],
+    [11,'ピアノ協奏曲第１番"蠍火"','165-185(185)',1414,'SOF-LAN'],
+    [29,'烽火連天の刃','190',1771,'CHARGE'],
+    [21,'海神(L)','159',1830,'CHARGE'],
+  ]},
+  {id:'jb', name:'地力B+',  color:'#44cc88',songs:[
+    [30,'anthracene','168',1744,'NOTES'],
+    [29,'Arkadia','180',1873,'NOTES'],
+    [28,'ASIAN VIRTUAL REALITIES (MELTING TOGETHER IN DAZZLING DARKNESS)','150',1752,'NOTES'],
+    [21,'BLUE DRAGON(雷龍RemixIIDX)','188',1727,'CHORD'],
+    [28,'Burning Flame(L)','165',1938,'NOTES'],
+    [25,'DEADHEAT','200',1721,'NOTES'],
+    [20,'Devilz Staircase','185',1685,'PEAK'],
+    [32,'Drop Syndicate','180',1861,'PEAK'],
+    [25,'DropZ-Line-','50-400(200)',1648,'SOF-LAN'],
+    [28,'DUAL STRIKER','185',1960,'NOTES'],
+    [17,'EXUSIA','188',1964,'NOTES'],
+    [17,'G59','170',2000,'CHORD'],
+    [23,'Godspeed','165',1631,'NOTES'],
+    [23,'Grand Chariot','191',1775,'NOTES'],
+    [29,'GRAVITON','185',1762,'NOTES'],
+    [22,'GUILTY(L)','148',1525,'NOTES'],
+    [24,'HADES','155',1601,'PEAK'],
+    [25,'Illusionary Waterlily','180',1803,'NOTES'],
+    [21,'INSOMNIA','195',1661,'CHORD'],
+    [27,'LASER CRUSTER (IGNITE REMIX)','174',1824,'NOTES'],
+    [32,'Lightspeed','200',1606,'NOTES'],
+    [31,'MAXIMUM CHEAT GIRL','210',1842,'NOTES'],
+    [22,'Monopole.','201',1729,'NOTES'],
+    [25,'NITROUS CANNON','169',1875,'NOTES'],
+    [27,'ORCA','155',1795,'NOTES'],
+    [29,'PLASMA SOUL NIGHT feat. Nana Takahashi / 709sec.','178',2271,'CHORD'],
+    [18,'Session 9 -Chronicles-','182-189(182)',1852,'NOTES'],
+    [22,'Shooting Fireball','160',1983,'NOTES'],
+    [24,'Sky High','153',1943,'NOTES'],
+    [25,'Slipstream','175',1822,'PEAK'],
+    [23,'STARLIGHT DANCEHALL(L)','177',1712,'NOTES'],
+    [23,'StrayedCatz','303',1490,'PEAK'],
+    [20,'Timepiece phase II','287',1665,'NOTES'],
+    [22,'TOXIC VIBRATION','197',1933,'NOTES'],
+    [26,'Trill auf G','188',1670,'NOTES'],
+    [12,'Twelfth Style(L)','160',1684,'PEAK'],
+    [15,'Ubertreffen(L)','174',1655,'NOTES'],
+    [31,'Vermilion Carol','175',1837,'NOTES'],
+    [26,'Visterhv','191',1869,'NOTES'],
+    [22,'We\'re so Happy (P*Light Remix) IIDX ver.','185',1896,'NOTES'],
+    [23,'Welcome(L)','170',1701,'CHORD'],
+    [23,'X','180',1952,'NOTES'],
+    [31,'Xb10r','200',1833,'NOTES'],
+    [25,'Xperanza','200',1637,'SCRATCH'],
+    [19,'YAKSHA','190',2000,'NOTES'],
+    [20,'\u0395\u039b\u03a0\u0399\u03a3(L)','175',1852,'NOTES'],
+    [20,'仮想空間の旅人たち(L)','151',1943,'CHORD'],
+    [19,'子供の落書き帳','280',1395,'PEAK'],
+    [29,'逆月','280',1920,'CHORD'],
+    [22,'少年は空を辿る','140',1729,'PEAK'],
+    [30,'ぞうしょく！？マイデンティティ','200',1851,'NOTES'],
+    [26,'抱きしめてモナムール','190',2110,'NOTES'],
+    [31,'電腦都市','240',1738,'NOTES'],
+    [21,'轟け！恋のビーンボール！！','180',1834,'NOTES'],
+    [20,'†渚の小悪魔ラヴリィ～レイディオ†(IIDX EDIT)','190',1835,'NOTES'],
+    [31,'未完成ノ蒸氣驅動乙女','170',1538,'NOTES'],
+    [27,'魅惑のYUMMYスイーツ','208',1586,'PEAK'],
+  ]},
+  {id:'kb', name:'個人差B+',color:'#22aa66',songs:[
+    [17,'AIR RAID FROM THA UNDAGROUND(L)','180',1523,'PEAK'],
+    [27,'Level 2','150',1488,'SCRATCH'],
+    [21,'MAD ATTACK(L)','140',1396,'SCRATCH'],
+    [16,'Marie Antoinette(L)','205-248(215)',1618,'CHORD'],
+    [7,'MAX 300','12-300(300)',1429,'PEAK'],
+    [25,'Papilio ulysses','180',1498,'CHARGE'],
+    [21,'ra\'am','111-222(111)',1461,'PEAK'],
+    [30,'24h Endurance Race','184',1743,'NOTES'],
+    [32,'灼熱 Lost Summer Dayz','168',1453,'SCRATCH'],
+    [29,'雪上断火','105-180(180)',1544,'SCRATCH'],
+    [21,'廿(L)','120-160(120)',1731,'PEAK'],
+    [24,'火影','136',1437,'SCRATCH'],
+    [15,'ミラージュ・レジデンス(L)','144',1676,'CHARGE'],
+  ]},
+  {id:'jbb',name:'地力B',   color:'#44ccdd',songs:[
+    [19,'A MINSTREL\uff5ever.short-scape\uff5e(L)','114',1954,'CHORD'],
+    [25,'AA -rebuild-','174',1820,'NOTES'],
+    [29,'Aftermath','200',1828,'CHARGE'],
+    [30,'Always We Trust In You','190',1625,'NOTES'],
+    [24,'Amazing Mirage(L)','153',1684,'CHORD'],
+    [29,'Angel\'s Ladder','155',1800,'NOTES'],
+    [23,'AO-1','195',1443,'NOTES'],
+    [16,'Arabian Rave Night(L)','180',1888,'NOTES'],
+    [30,'BIGWAVERS','177',1796,'CHORD'],
+    [16,'BITTER CHOCOLATE STRIKER','165',1990,'CHORD'],
+    [31,'BLAZING_LAZER','191',1752,'NOTES'],
+    [22,'Broken Sword','160',1887,'NOTES'],
+    [30,'Chaotoxin','180',1705,'PEAK'],
+    [22,'cinder','216',1601,'PEAK'],
+    [21,'Close the World feat.a\u2606ru','188',1739,'NOTES'],
+    [23,'CODE:1 \uff3brevision1.0.1\uff3d','145',1590,'NOTES'],
+    [16,'Colorful Cookie','180',1773,'PEAK'],
+    [22,'Cosmic Cat(L)','160',1651,'CHORD'],
+    [31,'Dahlia','185',1617,'PEAK'],
+    [18,'Dances with Snow Fairies','154',1623,'PEAK'],
+    [21,'DARK LEGACY','196',1828,'CHORD'],
+    [17,'DOMINION','196',1636,'PEAK'],
+    [22,'EBONY & IVORY','170',1520,'NOTES'],
+    [29,'Flying Castle','174',1877,'NOTES'],
+    [26,'GENE','163',2183,'NOTES'],
+    [30,'I','225',1901,'NOTES'],
+    [28,'innocent revolver','310',1990,'NOTES'],
+    [26,'KILL EACH OTHER','162',1945,'NOTES'],
+    [23,'Konzert V','160',1710,'PEAK'],
+    [12,'Little Little Princess(L)','180-212(212)',1946,'CHORD'],
+    [26,'LOST TECHNOLOGIE','157',1822,'NOTES'],
+    [30,'MAX 360','15-360(360)',1610,'PEAK'],
+    [31,'Million Dollar','180',1762,'NOTES'],
+    [22,'NEO GENERATOR SEVEN','182',1690,'CHORD'],
+    [20,'neu','199',1999,'PEAK'],
+    [29,'One for All','195',1632,'CHORD'],
+    [24,'OTENAMI Hurricane','215',1643,'NOTES'],
+    [20,'Proof of the existence','170',1675,'PEAK'],
+    [29,'Push on Beats!\uff5e音ゲの国のeX-ストリーマー\uff5e','164-172(168)',1748,'NOTES'],
+    [19,'QUANTUM TELEPORTATION(L)','152',1845,'PEAK'],
+    [19,'quaver\u266a','182-186(182)',1745,'NOTES'],
+    [23,'refrain','158',1857,'NOTES'],
+    [28,'rommmo','208',1762,'CHORD'],
+    [26,'ruin of opals','220-390(355)',1646,'SOF-LAN'],
+    [24,'SAY BAY','165',1455,'SCRATCH'],
+    [24,'Super Rush','190',1791,'CHORD'],
+    [20,'SYNC-ANTHEM','160-166(160)',1865,'NOTES'],
+    [27,'T-REX vs Velociraptor (In the Far east euphoria)','200',1636,'NOTES'],
+    [16,'THANK YOU FOR PLAYING(L)','45-170(170)',1534,'NOTES'],
+    [26,'THE DAY OF JUBILATIONS','181',1757,'NOTES'],
+    [15,'THE DEEP STRIKER(L)','173',1778,'CHORD'],
+    [31,'The Last Apocalypse','190',1903,'NOTES'],
+    [19,'The Limbo','200',1701,'NOTES'],
+    [29,'Triple Cross','196',1667,'CHARGE'],
+    [32,'u gotta beat','180',1806,'NOTES'],
+    [20,'Valanga','186',1647,'CHARGE'],
+    [28,'Vitrum','146',1848,'NOTES'],
+    [19,'yellow head joe(L)','187',1596,'NOTES'],
+    [21,'疾風迅雷','180',1493,'NOTES'],
+    [27,'深淵に捧ぐレクイエム','175',1537,'CHARGE'],
+    [25,'神謳 -RESONANCE-','180',2047,'NOTES'],
+    [19,'聖人の塔','97-194(97)',1567,'SOF-LAN'],
+    [22,'それは花火のような恋','182',1976,'NOTES'],
+    [20,'たまゆら','180',1407,'PEAK'],
+    [30,'儚キ戀ノ幻想譚','175',1808,'NOTES'],
+    [16,'不沈艦CANDY','188',1682,'PEAK'],
+    [24,'#MAGiCVLGiRL_TRVP_B3VTZ','100',1753,'NOTES'],
+    [20,'龍と少女とデコヒーレンス(L)','165',1713,'NOTES'],
+    [22,'リリーゼと炎龍レーヴァテイン','200',1771,'NOTES'],
+  ]},
+  {id:'kbb',name:'個人差B', color:'#22aacc',songs:[
+    [22,'FANTASTIC THREE','185',1649,'NOTES'],
+    [31,'GAME ON','105',1386,'SCRATCH'],
+    [22,'IMPLANTATION','145',1163,'PEAK'],
+    [22,'Invitation from Mr.C','230',1405,'NOTES'],
+    [18,'New Castle Legions','120-180(120)',1418,'SOF-LAN'],
+    [26,'ONIGOROSHI','400',1541,'NOTES'],
+    [14,'Sense 2007','140',1517,'PEAK'],
+    [24,'TOGAKUSHI','152',1343,'CHARGE'],
+    [20,'アストライアの双皿','173',1632,'NOTES'],
+    [29,'ハイテックトキオ(L)','165',1657,'NOTES'],
+    [31,'摩天楼','172',1309,'CHARGE'],
+    [28,'魔法のかくれんぼ','178-208(178)',1454,'CHARGE'],
+    [17,'ワルツ第17番 ト短調"大犬のワルツ"','230-320(300)',1684,'SOF-LAN'],
+  ]},
+  {id:'jc', name:'地力C',   color:'#ddcc33',songs:[
+    [31,'ACT0','185',1534,'NOTES'],
+    [27,'AKASHIC BREAK','205',1823,'CHORD'],
+    [21,'Ancient Scapes','178',1780,'NOTES'],
+    [14,'Candy Galy','184',1798,'NOTES'],
+    [6,'Colors (radio edit)','150',1258,'PEAK'],
+    [32,'COSMIC V3LOCITY','200',1716,'NOTES'],
+    [32,'destination','175',1698,'NOTES'],
+    [32,'DIVINE JUDGEMENT','190',1416,'CHARGE'],
+    [26,'Dr. Chemical & Killing Machine','165',1700,'NOTES'],
+    [22,'entelecheia','185',1657,'NOTES'],
+    [17,'Evans','185',1440,'NOTES'],
+    [32,'EX-MASSIVE FIGHTER','165',1725,'CHORD'],
+    [21,'Feel The Beat','175',1830,'NOTES'],
+    [29,'Fegrix','175',1687,'NOTES'],
+    [19,'fffff','138',1624,'NOTES'],
+    [27,'Friction\uff3b!\uff3dFunction','150',1634,'NOTES'],
+    [24,'FUZIN RIZIN','190',1929,'NOTES'],
+    [20,'GAIA','180',1676,'NOTES'],
+    [31,'Ghost Pulse','165',1409,'PEAK'],
+    [17,'GOLDEN CROSS','150',1765,'NOTES'],
+    [22,'Gravigazer','160',1533,'NOTES'],
+    [26,'HARD BRAIN','155',1914,'NOTES'],
+    [32,'Here We Go Now','170',1690,'CHORD'],
+    [21,'Idola','201',1826,'CHORD'],
+    [31,'JUSTICE/GUILTY feat. Nana Takahashi & 709sec.','183',1959,'CHORD'],
+    [16,'Kung-fu Empire(L)','177',1999,'CHORD'],
+    [26,'L.F.O','180',1687,'PEAK'],
+    [21,'Last Dance','150',1650,'PEAK'],
+    [26,'Lethal Weapon','90-180(180)',1646,'NOTES'],
+    [29,'LIVE DRIVING!! feat. 花たん','190',1947,'CHORD'],
+    [23,'M4K3 1T B0UNC3','150',1546,'CHORD'],
+    [27,'Megalara Garuda','180',1543,'PEAK'],
+    [30,'Meissa','124-174(174)',1435,'PEAK'],
+    [23,'Nightmare before oversleep','190',1500,'PEAK'],
+    [19,'NNRT','101-202(101)',1780,'CHORD'],
+    [30,'ONE AND ONLY','174',1639,'PEAK'],
+    [10,'One More Lovely','200',1452,'PEAK'],
+    [31,'Out of Control','185',1598,'NOTES'],
+    [21,'PUNISHER','180',1812,'NOTES'],
+    [32,'Roar of Chronos','175',1991,'NOTES'],
+    [30,'RINNE','198',1788,'CHORD'],
+    [22,'Say YEEEAHH','135',1677,'CHORD'],
+    [31,'Seven Times Four','170',1763,'NOTES'],
+    [29,'Silver Bullet','152-172(168)',1662,'SOF-LAN'],
+    [29,'Smalt #28598F','151',1725,'NOTES'],
+    [20,'Sol Cosine Job 2','190-200(190)',1625,'NOTES'],
+    [28,'SOLID STATE SQUAD -RISEN RELIC REMIX-','186',1670,'NOTES'],
+    [22,'Sounds Of Summer','175',1513,'CHORD'],
+    [30,'Super Freak','200',1754,'NOTES'],
+    [31,'Sword of Vengeance','208',1650,'NOTES'],
+    [27,'TECHNO Style Essentials','154',1453,'NOTES'],
+    [16,'thunder HOUSE NATION Remix(L)','128',1954,'CHORD'],
+    [24,'Umbral(L)','138',1566,'CHARGE'],
+    [27,'Vinculum stellarum','160',1873,'NOTES'],
+    [28,'Viridian','161',1700,'NOTES'],
+    [19,'WONDER WALKER','165',1921,'NOTES'],
+    [23,'紫陽花 -AZISAI-','155',1490,'PEAK'],
+    [29,'天邪鬼','155',1693,'NOTES'],
+    [24,'イザナミノナゲキ','195',1661,'NOTES'],
+    [30,'Ou Legends','191',1687,'NOTES'],
+    [30,'#CMFLG','155',1748,'NOTES'],
+    [20,'狂イ咲ケ焔ノ華','206',1860,'PEAK'],
+    [19,'恋する☆宇宙戦争っ！！','200',1835,'NOTES'],
+    [26,'最小三倍完全数','220',1314,'NOTES'],
+    [24,'〆','160',1877,'CHORD'],
+    [20,'シュレーディンガーの猫','187',1717,'NOTES'],
+    [28,'スーパー戦湯ババンバーン','187',1755,'NOTES'],
+    [21,'旋律のドグマ\uff5eMiserables\uff5e','192',2002,'NOTES'],
+    [20,'即席！脳直\u2605ミュージックシステム','197',1838,'NOTES'],
+    [31,'電光','165',1560,'NOTES'],
+    [14,'電人、暁に斃れる。','165',1725,'NOTES'],
+    [24,'童話回廊','262',1592,'NOTES'],
+    [20,'トリカゴノ鳳凰','185',1932,'NOTES'],
+    [22,'夏色DIARY - L.E.D.-G STYLE MIX -','190',1590,'NOTES'],
+    [15,'華爛漫 -Flowers-(L)','160',1597,'NOTES'],
+    [22,'表裏一体！？怪盗いいんちょの悩み','165',1815,'NOTES'],
+    [29,'禊','160',1631,'CHARGE'],
+    [23,'めいさいアイドル☆あいむちゃん♪','160',1717,'NOTES'],
+    [26,'龍王の霊廟(Mausoleum Of The Primal Dragon)(L)','144',2023,'CHARGE'],
+  ]},
+  {id:'kc', name:'個人差C', color:'#bbaa11',songs:[
+    [21,'Adularia','180',1449,'CHARGE'],
+    [30,'B.O.D.Y.','157',1734,'NOTES'],
+    [24,'Caterpillar','170',1561,'SCRATCH'],
+    [30,'dica dica','175',1638,'NOTES'],
+    [13,'DUE TOMORROW','100-400(400)',1073,'PEAK'],
+    [11,'FAKE TIME','200',1231,'PEAK'],
+    [8,'PLEASE DON\'T GO','135',1251,'PEAK'],
+    [23,'POSSESSION','23-185(185)',1521,'SOF-LAN'],
+    [12,'Scripted Connection\u21d2 A mix','151',1575,'NOTES'],
+    [21,'ATHER(L)','24-192(192)',1640,'CHORD'],
+    [30,'神のシナリオ','140',1652,'CHARGE'],
+    [21,'海神','159',1629,'CHARGE'],
+  ]},
+  {id:'jd', name:'地力D',   color:'#ff8844',songs:[
+    [11,'AA','154',1834,'NOTES'],
+    [18,'ALBIDA','185',1530,'CHORD'],
+    [22,'Beat Radiance(L)','192',1809,'CHORD'],
+    [32,'Bring The Fire','160',1734,'NOTES'],
+    [18,'Broken','148',1598,'PEAK'],
+    [26,'Carry Me Away','175',1613,'NOTES'],
+    [26,'Catch Our Fire!','190',1885,'NOTES'],
+    [13,'Concertino in Blue','103-155(140)',1311,'SOF-LAN'],
+    [26,'dAuntl3ss','166',1775,'NOTES'],
+    [27,'Double Dribble','210',1683,'SCRATCH'],
+    [26,'Drastic Dramatic','166',1765,'NOTES'],
+    [26,'DRUNK MONKY','145',1177,'NOTES'],
+    [26,'EVANESCENT','127-165(161)',1845,'NOTES'],
+    [14,'FIRE FIRE','150',1405,'PEAK'],
+    [31,'frequent','176',1900,'NOTES'],
+    [23,'Highcharge Divolt','200',1421,'NOTES'],
+    [30,'KING(L)','166',1983,'CHORD'],
+    [20,'Liberation','150',1905,'NOTES'],
+    [27,'Matt Silver','146',1707,'NOTES'],
+    [30,'No Border','150',1895,'NOTES'],
+    [15,'oratio','162',1493,'PEAK'],
+    [28,'Parvati','205',1467,'PEAK'],
+    [25,'Persephone','155',1539,'NOTES'],
+    [26,'Please Welcome Mr.C','230',1522,'CHORD'],
+    [24,'RAIN','159',1657,'NOTES'],
+    [25,'Rampage','195',1831,'CHORD'],
+    [24,'Rave Cannon','160',1700,'NOTES'],
+    [27,'Rave Patroller','175',1705,'PEAK'],
+    [12,'Scripted Connection\u21d2 H mix(L)','151',1466,'PEAK'],
+    [17,'SOLID STATE SQUAD','155',1819,'PEAK'],
+    [22,'SpaceLand\u2606TOYBOX','172',1501,'NOTES'],
+    [11,'spiral galaxy(L)','154',1910,'NOTES'],
+    [31,'Stereo Beasts','160',1881,'NOTES'],
+    [24,'Summerlights(IIDX Edition)','175',1580,'PEAK'],
+    [22,'The Least 100sec','200-264(264)',1505,'NOTES'],
+    [19,'The Sampling Paradise','150',1545,'NOTES'],
+    [19,'Thunderbolt','188',1911,'CHORD'],
+    [22,'TIEFSEE','165',1752,'NOTES'],
+    [19,'Todestrieb','185',1733,'NOTES'],
+    [20,'True Blue','164',1898,'NOTES'],
+    [5,'V','150',1519,'PEAK'],
+    [14,'VANESSA','185',1228,'NOTES'],
+    [27,'Ypsilon(L)','160',1801,'NOTES'],
+    [22,'ZZ','154',1541,'NOTES'],
+    [13,'華蝶風雪(L)','199',2014,'CHORD'],
+    [24,'九尾狐夜行','145',1521,'CHORD'],
+    [31,'終焔のClaudia','90-185(185)',1406,'NOTES'],
+    [15,'少年A','90-192(90)',1449,'PEAK'],
+    [24,'刃図羅','165',1746,'NOTES'],
+  ]},
+  {id:'kd', name:'個人差D', color:'#dd6622',songs:[
+    [17,'eRAseRmOToRpHAntOM','135-270(135)',1686,'CHORD'],
+    [28,'Fire Beat','157-300(157)',1392,'NOTES'],
+    [15,'ICARUS','126-251(176)',1301,'SOF-LAN'],
+    [10,'Innocent Walls','155',1446,'PEAK'],
+    [9,'one or eight','155',1177,'PEAK'],
+    [15,'TROOPERS','177',1496,'CHORD'],
+    [8,'桜','13-320(300)',1123,'SOF-LAN'],
+  ]},
+  {id:'je', name:'地力E',   color:'#ff5566',songs:[
+    [24,'Apocalypse','165',1814,'NOTES'],
+    [25,'Arca','185',1602,'PEAK'],
+    [28,'BIGソムタム','187',1688,'CHARGE'],
+    [25,'encounter','190',1679,'NOTES'],
+    [19,'F','154',1813,'NOTES'],
+    [30,'glacia','186',1492,'NOTES'],
+    [14,'GRID KNIGHT(L)','160',1744,'CHORD'],
+    [30,'Hat Surprise (Season 2)','180',1729,'NOTES'],
+    [21,'invoker','195',1624,'NOTES'],
+    [14,'LASER CRUSTER','152',1644,'NOTES'],
+    [27,'LIGHTNING STRIKES','174',1639,'NOTES'],
+    [20,'Little Star','183',1635,'NOTES'],
+    [9,'moon_child','130-160(146)',1300,'PEAK'],
+    [23,'NINJA IS DEAD IIDX ver.','111-222(222)',1520,'NOTES'],
+    [25,'Raspberry Railgun','142',1606,'NOTES'],
+    [11,'RED ZONE(L)','165',1566,'NOTES'],
+    [31,'Sirius','165',1637,'CHORD'],
+    [24,'Steel Edge','177',1604,'CHARGE'],
+    [24,'Sweet Clapper(L)','162',1485,'CHORD'],
+    [22,'Symmetry','163',1659,'NOTES'],
+    [24,'Venom','190',1624,'CHORD'],
+    [20,'\u0395\u039b\u03a0\u0399\u03a3','175',1600,'NOTES'],
+    [13,'カゴノトリ\uff5e弐式\uff5e','140',1325,'PEAK'],
+    [18,'黒髪乱れし修羅となりて','150',1745,'NOTES'],
+    [31,'\u300apl|rayer\u300b','180',1420,'CHORD'],
+    [22,'紅牡丹','181',1445,'NOTES'],
+  ]},
+  {id:'ke', name:'個人差E', color:'#dd3344',songs:[
+    [10,'Innocent Walls(H)','155',1281,'PEAK'],
+    [17,'mosaic','188',1509,'CHORD'],
+    [18,'sakura storm','184',1225,'NOTES'],
+    [12,'SCREAM SQUAD','220',1073,'PEAK'],
+    [31,'The Onlyonez','220',1587,'CHORD'],
+    [10,'雪月花','151',1287,'PEAK'],
+  ]},
+  {id:'jf', name:'地力F',   color:'#9999aa',songs:[
+    [7,'A','93-191(93)',1260,'PEAK'],
+    [11,'gigadelic(H)','173',1116,'PEAK'],
+    [11,'gigadelic','173',1301,'PEAK'],
+    [27,'Primitive Vibes','150',1564,'NOTES'],
+    [15,'Ristaccia','160',1386,'PEAK'],
+    [14,'snow storm(L)','145',1709,'NOTES'],
+    [18,'SPECIAL SUMMER CAMPAIGN!','168',1509,'NOTES'],
+    [31,'残像ニ繋ガレタ追憶ノHIDEAWAY','160',1789,'CHORD'],
+    [32,'スパークリング☆彡ハイパーチューン！！','177',1843,'CHORD'],
+    [22,'千年ノ理','153',1608,'CHORD'],
+  ]},
+];
+
+/* sort by ver */
+TIERS.forEach(t=>t.songs.sort((a,b)=>a[0]-b[0]));
+
+/* side menu */
+const mnList=document.getElementById('mn-list');
+mnList.innerHTML=TIERS.map(t=>`<a class="mn-a" href="#${t.id}" onclick="closeMn()"><span class="mn-grade" style="color:${t.color}">${t.name}</span><span class="mn-n">${t.songs.length}曲</span></a>`).join('');
+
+/* main content */
+const mainEl=document.getElementById('main');
+mainEl.innerHTML=TIERS.map(t=>{
+  const rows=t.songs.map(([ver,name,bpm,notes,type],i)=>{
+    const key=`${t.id}-${i}`;
+    return`<tr data-key="${key}" data-name="${esc(name)}"><td class="cv">${ver}</td><td class="cn" onclick="openDrop(event,'${key}')">${esc(name)}</td><td class="cb">${esc(bpm)}</td><td class="co">${notes.toLocaleString()}</td><td class="ct">${badge(type)}</td></tr>`;
+  }).join('');
+  return`<section class="ts" id="${t.id}"><div class="th" style="--tc:${t.color}"><h2>${t.name}</h2><span class="th-n">${t.songs.length}曲</span></div><table class="tbl"><colgroup><col class="cv"><col class="cn"><col class="cb"><col class="co"><col class="ct"></colgroup><thead><tr><th class="cv">ver</th><th class="cn">曲名</th><th class="cb">BPM(開幕)</th><th class="co">notes</th><th class="ct">タイプ</th></tr></thead><tbody>${rows}</tbody></table></section>`;
+}).join('');
+
+/* restore localStorage */
+TIERS.forEach(t=>t.songs.forEach(([,name],i)=>{
+  const st=loadStatus(name);
+  if(st){const row=document.querySelector(`tr[data-key="${t.id}-${i}"]`);if(row)applyStatus(row,st)}
+}));
+
+/* hamburger */
+const hbg=document.getElementById('hbg'),mn=document.getElementById('mn'),ov=document.getElementById('ov'),mc=document.getElementById('mc');
+function openMn(){mn.classList.add('open');hbg.classList.add('is-open');ov.classList.add('on');document.body.style.overflow='hidden'}
+function closeMn(){mn.classList.remove('open');hbg.classList.remove('is-open');ov.classList.remove('on');document.body.style.overflow=''}
+hbg.addEventListener('click',openMn);ov.addEventListener('click',closeMn);mc.addEventListener('click',closeMn);
+
+/* export / import */
+document.getElementById('exp-btn').addEventListener('click',()=>{
+  const data={};
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k.startsWith('iidx12_song_'))data[k]=localStorage.getItem(k);
+  }
+  const count=Object.keys(data).length;
+  if(count===0){alert('保存された記録がありません');return}
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='iidx_records.json';a.click();
+  URL.revokeObjectURL(url);
+});
+
+const impFile=document.getElementById('imp-file');
+document.getElementById('imp-btn').addEventListener('click',()=>impFile.click());
+impFile.addEventListener('change',e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      let count=0;
+      for(const[k,v]of Object.entries(data)){
+        if(k.startsWith('iidx12_song_')){localStorage.setItem(k,v);count++}
+      }
+      alert(`${count}件の記録を読み込みました。ページを再読み込みします。`);
+      location.reload();
+    }catch(err){alert('ファイルの読み込みに失敗しました。')}
+  };
+  reader.readAsText(file);
+  impFile.value='';
+});
+</script>
+</body>
+</html>
