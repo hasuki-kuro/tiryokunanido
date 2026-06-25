@@ -134,6 +134,8 @@ body{
   display:flex;align-items:center;gap:10px;
   z-index:100;
   box-shadow:0 2px 8px rgba(0,0,0,.5);
+  cursor:pointer;
+  user-select:none;
 }
 .th h2{
   font-size:13px;font-weight:700;
@@ -141,6 +143,9 @@ body{
   letter-spacing:.04em;
 }
 .th-n{font-size:11px;color:var(--dim)}
+.th-tog{margin-left:auto;font-size:10px;color:var(--dim);transition:transform .2s;flex-shrink:0}
+.ts.collapsed .th-tog{transform:rotate(-90deg)}
+.ts.collapsed .tbl{display:none}
 
 /* ── TABLE ── */
 .tbl{
@@ -1108,9 +1113,10 @@ mnList.innerHTML = TIERS.map(t =>
 /* ── build main content ── */
 const mainEl = document.getElementById('main');
 mainEl.innerHTML = TIERS.map(t => `<section class="ts" id="${t.id}">
-    <div class="th" style="--tc:${t.color}">
+    <div class="th" style="--tc:${t.color}" onclick="toggleTier('${t.id}')">
       <h2>${t.name}</h2>
       <span class="th-n">${t.songs.length}曲</span>
+      <span class="th-tog">▼</span>
     </div>
     <table class="tbl">
       <colgroup>
@@ -1138,6 +1144,17 @@ mainEl.addEventListener('click', e => {
 
 /* ── restore saved statuses from localStorage ── */
 TIERS.forEach(t => restoreStatus(t));
+
+/* ── tier collapse ── */
+function toggleTier(id){
+  const sec = document.getElementById(id);
+  const collapsed = sec.classList.toggle('collapsed');
+  localStorage.setItem('iidx12_col_'+id, collapsed ? '1' : '');
+}
+TIERS.forEach(t => {
+  if(localStorage.getItem('iidx12_col_'+t.id))
+    document.getElementById(t.id)?.classList.add('collapsed');
+});
 
 /* ── hamburger / menu logic ── */
 const hbg = document.getElementById('hbg');
