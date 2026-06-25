@@ -47,9 +47,12 @@ body{background:var(--bg);color:var(--txt);font-family:'Hiragino Kaku Gothic Pro
 
 /* TIER */
 .ts{margin-bottom:24px}
-.th{position:sticky;top:var(--hh);background:#0d0d1c;border-left:4px solid var(--tc,#666);padding:6px 14px;display:flex;align-items:center;gap:10px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.th{position:sticky;top:var(--hh);background:#0d0d1c;border-left:4px solid var(--tc,#666);padding:6px 14px;display:flex;align-items:center;gap:10px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.5);cursor:pointer;user-select:none}
 .th h2{font-size:13px;font-weight:700;color:var(--tc,#888);letter-spacing:.04em}
 .th-n{font-size:11px;color:var(--dim)}
+.th-tog{margin-left:auto;font-size:10px;color:var(--dim);transition:transform .2s;flex-shrink:0}
+.ts.collapsed .th-tog{transform:rotate(-90deg)}
+.ts.collapsed .tbl{display:none}
 
 /* TABLE */
 .tbl{width:100%;border-collapse:collapse;table-layout:fixed}
@@ -890,13 +893,24 @@ mnList.innerHTML=TIERS.map(t=>`<a class="mn-a" href="#${t.id}" onclick="closeMn(
 
 /* main content */
 const mainEl=document.getElementById('main');
-mainEl.innerHTML=TIERS.map(t=>`<section class="ts" id="${t.id}"><div class="th" style="--tc:${t.color}"><h2>${t.name}</h2><span class="th-n">${t.songs.length}曲</span></div><table class="tbl"><colgroup><col class="cv"><col class="cn"><col class="cb"><col class="co"><col class="ct"></colgroup><thead><tr><th class="cv sortable sort-asc" data-col="ver">ver</th><th class="cn sortable" data-col="name">曲名</th><th class="cb sortable" data-col="bpm">BPM(開幕)</th><th class="co sortable" data-col="notes">notes</th><th class="ct sortable" data-col="type">タイプ</th></tr></thead><tbody>${makeRows(t)}</tbody></table></section>`).join('');
+mainEl.innerHTML=TIERS.map(t=>`<section class="ts" id="${t.id}"><div class="th" style="--tc:${t.color}" onclick="toggleTier('${t.id}')"><h2>${t.name}</h2><span class="th-n">${t.songs.length}曲</span><span class="th-tog">▼</span></div><table class="tbl"><colgroup><col class="cv"><col class="cn"><col class="cb"><col class="co"><col class="ct"></colgroup><thead><tr><th class="cv sortable sort-asc" data-col="ver">ver</th><th class="cn sortable" data-col="name">曲名</th><th class="cb sortable" data-col="bpm">BPM(開幕)</th><th class="co sortable" data-col="notes">notes</th><th class="ct sortable" data-col="type">タイプ</th></tr></thead><tbody>${makeRows(t)}</tbody></table></section>`).join('');
 
 /* click header to sort */
 mainEl.addEventListener('click',e=>{const th=e.target.closest('th[data-col]');if(th)updateSort(th.dataset.col)});
 
 /* restore localStorage */
 TIERS.forEach(t=>restoreStatus(t));
+
+/* tier collapse */
+function toggleTier(id){
+  const sec=document.getElementById(id);
+  const collapsed=sec.classList.toggle('collapsed');
+  localStorage.setItem('iidx12_col_'+id,collapsed?'1':'');
+}
+TIERS.forEach(t=>{
+  if(localStorage.getItem('iidx12_col_'+t.id))
+    document.getElementById(t.id)?.classList.add('collapsed');
+});
 
 /* hamburger */
 const hbg=document.getElementById('hbg'),mn=document.getElementById('mn'),ov=document.getElementById('ov'),mc=document.getElementById('mc');
